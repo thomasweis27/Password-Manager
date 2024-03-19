@@ -6,10 +6,13 @@ import hashlib
 from credentialSetsModule import data_menu_function
 from createAccount import create_account
 
+def return_to_login():
+    exit()
+
 def loginPage():
     login = tk.Tk()
     login.title("Password Manager")
-    login.geometry("400x200")
+    login.geometry("400x300")
 
     def getValue():
         enteredUsername = usernameEntry.get()
@@ -28,7 +31,9 @@ def loginPage():
                     data_menu_function(enteredPassword)
                     break
 
-    label = tk.Label(login, text="\nPassword Manager\n")
+    labelheader = tk.Label(login, text="\nPassword Manager\n")
+    label = tk.Label(login, text="\nLogin:\n")
+    labelheader.pack()
     label.pack()
 
     #username
@@ -50,15 +55,27 @@ def loginPage():
 
     #menu buttons
     button1 = tk.Button(login, text="About Us", command=show_creaters)
+    spaceRight = tk.Label(login, text="    ")
+    spaceLeft = tk.Label(login, text="    ")
     button2 = tk.Button(login, text="Create Account", command=lambda: create_account(login))  
 
     # Pack the buttons side by side
+    spaceRight.pack(side=tk.RIGHT)
     button1.pack(side=tk.RIGHT)
+    spaceLeft.pack(side=tk.LEFT)
     button2.pack(side=tk.LEFT)
+
+    buttonlogout = tk.Button(login, text="Quit", command=return_to_login)
+    spaceBottom = tk.Label(login, text="    ")
+    spaceBottom.pack(side=tk.BOTTOM)
+    buttonlogout.pack(side=tk.BOTTOM)
+    
 
     login.mainloop()
 
 def show_creaters():
-    messagebox.showinfo("About us", "Cale, Thomas, Mason Senior Project (add more as needed)")
+    messagebox.showinfo("About us", "Cale, Thomas, Mason are seniors at Wittenberg University and this is their Senior Project.")
+
+
 
 loginPage()
