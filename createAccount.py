@@ -1,8 +1,29 @@
-# createAccount.py
-
 import tkinter as tk
 from tkinter import messagebox
 import hashlib
+
+def checkPasswordRequirements(usernameEntry, passwordEntry, login, createAccount):
+    print("Checking requirements...")
+    specalCharacters = "[!@#$%^&*()+_-=}{[]:\|,./<>?;'<>?"
+    password = passwordEntry.get()
+    
+    #if statments that check to see if th account meets password requirements
+    if len(password) < 12:
+        messagebox.showinfo("Error", "Please make sure that password is 12 characters or longer.")
+    elif any(char.isdigit() for char in password) == False:
+        messagebox.showinfo("Error", "Please make sure that password contains a number.")
+    elif any(char.isupper() for char in password) == False:
+        messagebox.showinfo("Error", "Please make sure that password contains upper case letters.")
+    elif any(char.islower() for char in password) == False:
+        messagebox.showinfo("Error", "Please make sure that password contains a lower case letters.")
+    elif any(char in specalCharacters for char in password) == False:
+        messagebox.showinfo("Error", "Please make sure that password contains a special character.")
+    else:
+        getNewUser(usernameEntry, passwordEntry, login)
+        createAccount.destroy()
+
+
+
 
 def getNewUser(usernameEntry, passwordEntry, login):
     enteredUsername = usernameEntry.get()
@@ -46,5 +67,5 @@ def create_account(login):
     passwordEntry = tk.Entry(createAccount, textvariable=password)
     passwordEntry.pack()
 
-    button_submit = tk.Button(createAccount, text="Create Account", command=lambda: [getNewUser(usernameEntry, passwordEntry, login), createAccount.destroy()])  
+    button_submit = tk.Button(createAccount, text="Create Account", command=lambda: checkPasswordRequirements(usernameEntry, passwordEntry, login, createAccount))  
     button_submit.pack()
