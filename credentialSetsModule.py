@@ -3,7 +3,7 @@ import tkinter as tk
 from tkinter import messagebox
 
 def return_to_login():
-    SUPmenu.destroy()
+    exit()
 
 def removeSiteData():
     selected_item = listbox.get(tk.ACTIVE)
