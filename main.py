@@ -5,6 +5,7 @@ from tkinter import messagebox
 import hashlib
 from credentialSetsModule import data_menu_function
 from createAccount import create_account
+from editAccount import edit_account
 
 def return_to_login():
     exit()
@@ -12,7 +13,7 @@ def return_to_login():
 def loginPage():
     login = tk.Tk()
     login.title("Password Manager")
-    login.geometry("400x300")
+    login.geometry("400x330")
 
     def getValue():
         enteredUsername = usernameEntry.get()
@@ -57,11 +58,12 @@ def loginPage():
     button1 = tk.Button(login, text="About Us", command=show_creaters)
     spaceRight = tk.Label(login, text="    ")
     spaceLeft = tk.Label(login, text="    ")
-    button2 = tk.Button(login, text="Create Account", command=lambda: create_account(login))  
+    button2 = tk.Button(login, text="Create Account", command=lambda: create_account(login))
+    button3 = tk.Button(login, text="Edit Account", command=lambda: edit_account(login))  
 
     # Pack the buttons side by side
     spaceRight.pack(side=tk.RIGHT)
-    button1.pack(side=tk.RIGHT)
+    button3.pack(side=tk.RIGHT)
     spaceLeft.pack(side=tk.LEFT)
     button2.pack(side=tk.LEFT)
 
@@ -69,6 +71,7 @@ def loginPage():
     spaceBottom = tk.Label(login, text="    ")
     spaceBottom.pack(side=tk.BOTTOM)
     buttonlogout.pack(side=tk.BOTTOM)
+    button1.pack(side=tk.BOTTOM)
     
 
     login.mainloop()
