@@ -3,6 +3,9 @@
 #was mostly for me to make sure that I could pass over log in 
 #credentials to the credential screen.
 
+#sites .txt should get replaced with whatever mason is making
+
+
 #imports
 import tkinter as tk
 from tkinter import messagebox
