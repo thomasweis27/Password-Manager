@@ -1,3 +1,8 @@
+#This was a basic proof of concept modual starting point, 
+#Cale, feel free to change any of this, its a basic proof of concept and 
+#was mostly for me to make sure that I could pass over log in 
+#credentials to the credential screen.
+
 #imports
 import tkinter as tk
 from tkinter import messagebox
