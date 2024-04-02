@@ -4,6 +4,8 @@
     # allows user to view all credential sets;
     # allows user to search for a 
     # specific credential by service name
+# 04/01 - this will be modified to plug into the system more modularly once we know
+        # how we want to set everything up (possibly after a driver, etc.)
 
 import os
 
@@ -11,7 +13,7 @@ import os
 
 # termedSearch function
     # allows user to enter a search term;
-    # queries the data file for an entry with that term in its site_name field
+    # queries the data file for an entry with that term in any of its fields
 def termedSearch():
 
     # prompt user for a search term (input loop)
@@ -55,7 +57,10 @@ def termedSearch():
                                 print("  Comment line")
                                 # move to next line
                                 continue
-                            # otherwise, check the first field (the service name)
+                            # not a comment; check that the hash in the line matches current user's
+                            # elif hash != currentUserHash:
+                                # continue
+                            # line isn't commented out and the hashes match
                             else:
                                 # does the line's name match?
                                 # if there is a match for the search term
@@ -109,11 +114,11 @@ def dataRestorePoint():
     print("Loading Data Reset Point...")
 
     # set current data file contents
-    Lines = ["$site_title,username,password,security1_type,security1,security2_type,security2,security3_type,security3,pinned$\n",
-            "$security_status fields can be nulled to indicate no additional security on site$\n",
-            "$nulled security_status fields will not require security_info and will null the following security fields$\n\n" 
-            "site1,testuser,testpass,null,null,null,null,null,null,true$\n"
-            "site2,testuser,testpass,question,What is the first letter of the alphabet = A,null,null,null,null,false$\n"]
+    Lines = ["$user_hash,site_title,username,password,security1_type,security1,security2_type,security2,security3_type,security3,add_info,pinned$",
+            "$security_status fields can be nulled to indicate no additional security on site$",
+            "$nulled security_status fields will not require security_info and will null the following security fields$",
+            "00000000,site1,testuser,testpass,null,null,null,null,null,null,add_info,true$",
+            "00000000,site2,testuser,testpass,question,What is the first letter of the alphabet = A,null,null,null,null,add_info,false$"]
 
     # remove old and create new credential file
     if os.path.exists("credentials.txt"):
