@@ -4,11 +4,11 @@
 * editAccount.py            Changes the login info
 * main.py                   Login page and program starting point.
 * users.txt                 A list of all the user hashes to see if the user has an account
+
+
+### Data Accessing Module 
 * encrypt.py                A program for encrypting data
 * decrypt.py                A program for decrypting data
-
-
-### Data Accessing modual 
 * accessCredentialSets.py   Access credentials from the txt file
 * addCredentialSet.py       Add credentials to the txt file
 * credentialsMainScreen.py  Main program after authenticating
