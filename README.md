@@ -4,6 +4,8 @@
 * editAccount.py            Changes the login info
 * main.py                   Login page and program starting point.
 * users.txt                 A list of all the user hashes to see if the user has an account
+* encrypt.py                A program for encrypting data
+* decrypt.py                A program for decrypting data
 
 
 ### Data Accessing modual 
