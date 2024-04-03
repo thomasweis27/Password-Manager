@@ -371,7 +371,7 @@ def addCredentialSet():
     # inform the user that the named credential set has been successfully created and added to their sets list.
     print("Your new service " + name + " has been added to your sets. You can now access this set at any time!")
 
-def main():
-    addCredentialSet()
-
-main()
+#def main():
+#    addCredentialSet()
+#
+#main()

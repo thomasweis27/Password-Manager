@@ -1,9 +1,8 @@
 # main.py
-
 import tkinter as tk
 from tkinter import messagebox
 import hashlib
-from credentialSetsModule import data_menu_function
+from credentialsMainScreen import credentialsMainScreen
 from createAccount import create_account
 from editAccount import edit_account
 
@@ -16,6 +15,8 @@ def loginPage():
     login.geometry("400x330")
 
     def getValue():
+        oldHash = ""
+
         enteredUsername = usernameEntry.get()
         enteredPassword = passwordEntry.get()
 
@@ -29,7 +30,7 @@ def loginPage():
                 if hashed_data.hexdigest() == line.strip():  # Strip trailing newline
                     print("Login successful")
                     login.withdraw()
-                    data_menu_function(enteredPassword)
+                    credentialsMainScreen(enteredPassword, hashed_data.hexdigest(), oldHash, login)
                     break
 
     labelheader = tk.Label(login, text="\nPassword Manager\n")
