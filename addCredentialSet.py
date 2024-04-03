@@ -10,14 +10,30 @@
         # how we want to set everything up (possibly after a driver, etc.)
 # 04/01 - working on enforcing the [A-Z a-z 0-9 common special character] 
         # input constraints. More research...
+        # 04/03 - resolved with isVarchar function
 
-import os
+import tkinter as tk
 
 # functions of this component
 
+# isVarchar function
+    # checks that the passed value (string) is a varchar
+def isVarchar(string):
+    # regexpression for symbols
+    varchar_regex = " !@#$%^&*()+_-=}{[]:\|,./<>?;'<>?"
+    # iterate over every character in the string
+    for char in string:
+        # check that the character is alphanumeric OR symbol
+        if not(char.isalnum() or (char in varchar_regex)):
+            # this passed string is not a varchar
+            return False
+    # if the function passes over all chars and does not encounter issues
+    # passed string is indeed a varchar
+    return True
+
 # addCredentialSet function
     # allows the user to add a new credential set to their list
-def addCredentialSet():
+def addCredentialSet():    
     # initialize variables
     name = ""
     username = ""
@@ -67,6 +83,11 @@ def addCredentialSet():
         if (len(inp) > 48) or (len(inp) <= 0):
             print("   This is an invalid username. Please enter a username that is between 1 and 48 characters in length.")
             continue
+        # is input varchar?
+        if isVarchar(inp) == False:
+            # this is an invalid input
+            print("   This is an invalid username. Please enter a username that does not use restricted characters.")
+            continue
         # the input is a valid username
         # lower the input for consistency and assign it to username
         inp = inp.lower()
@@ -82,6 +103,11 @@ def addCredentialSet():
         # is input less than or equal to 48 characters but not empty?
         if (len(inp) > 48) or (len(inp) <= 0):
             print("   This is an invalid password. Please enter a password that is between 1 and 48 characters in length.")
+            continue
+        # is input varchar?
+        if isVarchar(inp) == False:
+            # this is an invalid input
+            print("   This is an invalid password. Please enter a password that does not use restricted characters.")
             continue
         # the input is a valid password
         # lower the input for consistency and assign it to password
@@ -111,7 +137,12 @@ def addCredentialSet():
                 inp = inp.lower()
                 # enforce type constraints and require application of a value to this field
                 # is input less than or equal to 128 but not empty?
-                if (len(inp) > 1) and (len(inp) <= 128):
+                if (len(inp) > 0) and (len(inp) <= 128):
+                    # is input varchar?
+                    if isVarchar(inp) == False:
+                        # this is an invalid input
+                        print("      This is an invalid question. Please enter a question that does not use restricted characters.")
+                        continue
                     # question is of valid format; add the question to the security 1 field
                     security1 = inp
                     break
@@ -126,7 +157,12 @@ def addCredentialSet():
                 inp = inp.lower()
                 # enforce type constraints and require application of a value to this field
                 # is input less than or equal to 128 but not empty?
-                if (len(inp) > 1) and (len(inp) <= 128):
+                if (len(inp) > 0) and (len(inp) <= 128):
+                    # is input varchar?
+                    if isVarchar(inp) == False:
+                        # this is an invalid input
+                        print("      This is an invalid answer. Please enter an answer that does not use restricted characters.")
+                        continue
                     # answer is of valid format; add the answer to the security 1 field
                     security1 = security1 + " = " + inp
                     break
@@ -150,12 +186,17 @@ def addCredentialSet():
                     print("   Adding 2nd security question.")
                     # prompt loop for input of the question (variable character (a-z, 0-9, symbols) value <= 128 chars)
                     while(True):
-                        print("      Please enter the 2nd security question: ", end = '')
+                        print("      Please enter the question: ", end = '')
                         inp = input()
                         inp = inp.lower()
                         # enforce type constraints and require application of a value to this field
                         # is input less than or equal to 128 but not empty?
-                        if (len(inp) > 1) and (len(inp) <= 128):
+                        if (len(inp) > 0) and (len(inp) <= 128):
+                            # is input varchar?
+                            if isVarchar(inp) == False:
+                                # this is an invalid input
+                                print("      This is an invalid question. Please enter a question that does not use restricted characters.")
+                                continue
                             # question is of valid format; add the question to the security 1 field
                             security2 = inp
                             break
@@ -170,7 +211,12 @@ def addCredentialSet():
                         inp = inp.lower()
                         # enforce type constraints and require application of a value to this field
                         # is input less than or equal to 128 but not empty?
-                        if (len(inp) > 1) and (len(inp) <= 128):
+                        if (len(inp) > 0) and (len(inp) <= 128):
+                            # is input varchar?
+                            if isVarchar(inp) == False:
+                                # this is an invalid input
+                                print("      This is an invalid answer. Please enter an answer that does not use restricted characters.")
+                                continue
                             # answer is of valid format; add the answer to the security 2 field
                             security2 = security2 + " = " + inp
                             break
@@ -194,12 +240,17 @@ def addCredentialSet():
                             print("   Adding 3rd security question.")
                             # prompt loop for input of the question (variable character (a-z, 0-9, symbols) value <= 128 chars)
                             while(True):
-                                print("      Please enter the 3rd security question: ", end = '')
+                                print("      Please enter the question: ", end = '')
                                 inp = input()
                                 inp = inp.lower()
                                 # enforce type constraints and require application of a value to this field
                                 # is input less than or equal to 128 but not empty?
-                                if (len(inp) > 1) and (len(inp) <= 128):
+                                if (len(inp) > 0) and (len(inp) <= 128):
+                                    # is input varchar?
+                                    if isVarchar(inp) == False:
+                                        # this is an invalid input
+                                        print("      This is an invalid question. Please enter a question that does not use restricted characters.")
+                                        continue
                                     # question is of valid format; add the question to the security 1 field
                                     security3 = inp
                                     break
@@ -214,7 +265,12 @@ def addCredentialSet():
                                 inp = inp.lower()
                                 # enforce type constraints and require application of a value to this field
                                 # is input less than or equal to 128 but not empty?
-                                if (len(inp) > 1) and (len(inp) <= 128):
+                                if (len(inp) > 0) and (len(inp) <= 128):
+                                    # is input varchar?
+                                    if isVarchar(inp) == False:
+                                        # this is an invalid input
+                                        print("      This is an invalid answer. Please enter an answer that does not use restricted characters.")
+                                        continue
                                     # answer is of valid format; add the answer to the security 1 field
                                     security3 = security3 + " = " + inp
                                     break
@@ -247,6 +303,11 @@ def addCredentialSet():
         # is the input less than or equal to 2048?
         if (len(inp) > 2048):
             print("   This additional information exceeds the 2,048 character limit. Please enter a smaller value.")
+            continue
+        # is input varchar?
+        if isVarchar(inp) == False:
+            # this is an invalid input
+            print("   This additional information is invalid. Please enter info that does not use restricted characters.")
             continue
         # the input is valid additional information
         # lower the input for consistency and assign it to add_info
@@ -290,7 +351,7 @@ def addCredentialSet():
     data_line_output = ""
     # start by adding the current user's hash
     # placeholder code for now
-    data_line_output += current_user + ","
+    data_line_output += "\n" + current_user + ","
     # service name, username, password
     data_line_output += name + "," + username + "," + password + ","
     # security questions
@@ -298,7 +359,7 @@ def addCredentialSet():
     data_line_output += str(security2_active) + "," + security2 + ","
     data_line_output += str(security3_active) + "," + security3 + ","
     # additional info, pinned status
-    data_line_output += add_info + "," + str(pinned) + "$\n"
+    data_line_output += add_info + "," + str(pinned) + "$"
     # encrypt the line
     # 04/02 - To Do
     # open the credentials data file
