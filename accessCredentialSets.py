@@ -11,6 +11,7 @@
 # 04/07 - UI setup and rework. 
         # replacing proof-of-concept console ui with Tkinter
         # fixing component flow to work with main system
+        # TO DO: finish up the UI implementation. Works for now but no functionality
 
 #_____________________________________________________________________________________________________
 
@@ -25,8 +26,8 @@ import tkinter as tk
 #_____________________________________________________________________________________________________
 
 ## Main Component Functions
-## flow of program: 
-## 
+## flow of program: accessCredentialSets() -> termedSearch() ->
+## accessCredentialSets() will interface with the main system driver and get a search term
 ## termedSearch() will take the given search term and find any matches in the database file
 ##
 ## segments are declared and defined in reverse order
@@ -155,6 +156,10 @@ def accessCredentialSets(user_hash, loginScreen):
         + "Any service that includes that term will show up.")
     infoLabel.pack()
 
+
+
+
+
     # # prompt for search
     # while(True):
     #     print("\nWould you like to search for a service?")
@@ -193,7 +198,3 @@ def accessCredentialSets(user_hash, loginScreen):
     #     # reached only if proper input has been enforced and carried out
     #     break
     
-                    
-        
-
-#main()
