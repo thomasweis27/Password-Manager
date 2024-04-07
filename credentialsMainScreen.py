@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 from addCredentialSet import addCredentialSet
-from accessCredentialSets import main
+from accessCredentialSets import accessCredentialSets
 
 
 def logout(login, window):
@@ -13,20 +13,20 @@ def logout(login, window):
 # enteredPassword, hashed_data.hexdigest() will be used to figure out if this is one of the current user's sites
 # oldhash will be used only if the user will be changing their login info.
 # login is the login screen.
-def credentialsMainScreen(enteredPassword, curreentHash, oldHash, login):
+def credentialsMainScreen(enteredPassword, currentHash, oldHash, login):
     login.withdraw()
-    print(enteredPassword, curreentHash, oldHash)
+    print(enteredPassword, currentHash, oldHash)
 
     window = tk.Tk()
-    window.geometry("600x600")
+    window.geometry("800x450")
     window.title("Password Manager")
 
     frmSideBar = tk.Frame(window, relief = tk.RAISED, bd = 2, height=window.winfo_height())
     frmSideBar.grid(row=0, column=0)
 
     mainBtn = tk.Button(master = frmSideBar, text = "Main", width=10, height=2)
-    searchBtn = tk.Button(master = frmSideBar, text = "Search", height=2, command=lambda: addCredentialSet())
-    addBtn = tk.Button(master = frmSideBar, text = "Add", height=2, command=lambda: addCredentialSet())
+    searchBtn = tk.Button(master = frmSideBar, text = "Search", height=2, command=lambda: accessCredentialSets(currentHash, login))
+    addBtn = tk.Button(master = frmSideBar, text = "Add", height=2, command=lambda: addCredentialSet(currentHash, login))
     editBtn = tk.Button(master = frmSideBar, text = "Edit", height=2)
     accountBtn = tk.Button(master = frmSideBar, text = "Button", height=2)
     logoutBtn = tk.Button(master = frmSideBar, text = "Logout", height=2, command=lambda: logout(login, window))

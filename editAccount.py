@@ -71,7 +71,7 @@ def edit_account(login):
     
     createAccount = tk.Toplevel(login)  # Create a new window
     createAccount.title("Password Manager")
-    createAccount.geometry("400x300")
+    createAccount.geometry("800x450")
 
     label = tk.Label(createAccount, text="\nEdit Existing Account\n")
     label.pack()

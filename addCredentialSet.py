@@ -1,4 +1,6 @@
 
+#_____________________________________________________________________________________________________
+## COMPONENT DESCRIPTION AND HISTORY
 
 # addCredentialSet component
     # allows user to create a new credential set;
@@ -11,10 +13,20 @@
 # 04/01 - working on enforcing the [A-Z a-z 0-9 common special character] 
         # input constraints. More research...
         # 04/03 - resolved with isVarchar function
+# 04/05-07 - UI implementation; 
+        # proof-of-concept console program replaced by proper UI program
+        # broken into 3 main segments
+        # TO DO: need to add radial buttons for security questions and inputs;
+            # pinned status as well
+
+#_____________________________________________________________________________________________________
 
 import tkinter as tk
 
-# functions of this component
+## helper functions of this component
+
+#_____________________________________________________________________________________________________
+
 
 # isVarchar function
     # checks that the passed value (string) is a varchar
@@ -31,327 +43,66 @@ def isVarchar(string):
     # passed string is indeed a varchar
     return True
 
-# addCredentialSet function
-    # allows the user to add a new credential set to their list
-def addCredentialSet():    
-    # initialize variables
-    name = ""
-    username = ""
-    password = ""
-    security1_active = False
-    security1 = ""
-    security2_active = False
-    security2 = ""
-    security3_active = False
-    security3 = ""
-    add_info = ""
-    pinned = False
-    # placeholder code
-    current_user = "00000000"
-    # pseudo
-    # tell the user that they will need x data (listed above) to create the new set
-    print("Adding a new credential set...\nPlease have the following information ready:\n"
-        + "   1. Service/Site name\n   2. Username\n   3. Password\n"
-        + "   4. Security Questions (3 max)\n   5. Any additional information regarding the site")
-    # prompt loop for the service name (alphanumerical value that is <= 32 chars)
-    while(True):
-        # prompt user for input of name and save their input
-        print("   Please enter the name of the service: ", end = '')
-        inp = input()
-        # enforce type constraints and require application of a value to this field
-        # is input alphanumerical?
-        if not (inp.isalnum()):
-            print("   This is an invalid name. Please use only letters and numbers.")
-            continue
-        # is input less than or equal to 32 characters but not empty?
-        if (len(inp) > 32) or (len(inp) <= 0):
-            print("   This is an invalid name. Please enter a name that is between 1 and 32 characters in length.")
-            continue
-        # the name is alphanumerical and between 1-32 chars, valid name
-        # lower the input for consistency and assign it to name
-        inp = inp.lower()
-        name = inp
-        # escape prompt loop once a valid name is given
-        break
-    # prompt loop for the username (variable character (a-z, 0-9, symbols) value <= 48 chars)
-    while(True):
-        # prompt user for input of username and save their input
-        print("   Please enter the username: ", end = '')
-        inp = input()
-        # enforce type constraints and require application of a value to this field
-        # is input less than or equal to 48 characters but not empty?
-        if (len(inp) > 48) or (len(inp) <= 0):
-            print("   This is an invalid username. Please enter a username that is between 1 and 48 characters in length.")
-            continue
-        # is input varchar?
-        if isVarchar(inp) == False:
-            # this is an invalid input
-            print("   This is an invalid username. Please enter a username that does not use restricted characters.")
-            continue
-        # the input is a valid username
-        # lower the input for consistency and assign it to username
-        inp = inp.lower()
-        username = inp
-        # escape prompt loop once a valid username is given
-        break
-    # prompt loop for the password (variable character (a-z, 0-9, symbols) value <= 48 chars)
-    while(True):
-        # prompt user for input of password and save their input
-        print("   Please enter the password: ", end = '')
-        inp = input()
-        # enforce type constraints and require application of a value to this field
-        # is input less than or equal to 48 characters but not empty?
-        if (len(inp) > 48) or (len(inp) <= 0):
-            print("   This is an invalid password. Please enter a password that is between 1 and 48 characters in length.")
-            continue
-        # is input varchar?
-        if isVarchar(inp) == False:
-            # this is an invalid input
-            print("   This is an invalid password. Please enter a password that does not use restricted characters.")
-            continue
-        # the input is a valid password
-        # lower the input for consistency and assign it to password
-        inp = inp.lower()
-        password = inp
-        # escape prompt loop once a valid name is given
-        break
-    # security questions (nested)
-    # prompt loop for the activation of the 1st security question
-    while(True):
-        # prompt if the user wants to add the first security question
-        print("   Would you like to add a security question? (Y/N): ", end = '')
-        inp = input()
-        inp = inp.lower()
-        # check that the user input y/n
-        if inp == 'n':
-            # user does not need any security questions, break out of loop
-            break
-        elif inp == 'y':
-            # user does want to add the first security question
-            security1_active = True
-            print("   Adding security question.")
-            # prompt loop for input of the question (variable character (a-z, 0-9, symbols) value <= 128 chars)
-            while(True):
-                print("      Please enter the question: ", end = '')
-                inp = input()
-                inp = inp.lower()
-                # enforce type constraints and require application of a value to this field
-                # is input less than or equal to 128 but not empty?
-                if (len(inp) > 0) and (len(inp) <= 128):
-                    # is input varchar?
-                    if isVarchar(inp) == False:
-                        # this is an invalid input
-                        print("      This is an invalid question. Please enter a question that does not use restricted characters.")
-                        continue
-                    # question is of valid format; add the question to the security 1 field
-                    security1 = inp
-                    break
-                # otherwise the input is not valid
-                else:
-                    print("      This is an invalid input. Please enter a security question less than 128 characters.")
-                    continue
-            # prompt loop for input of the answer (variable character (a-z, 0-9, symbols) value <= 128 chars)
-            while(True):
-                print("      Please enter the answer to " + security1 +": ", end = '')
-                inp = input()
-                inp = inp.lower()
-                # enforce type constraints and require application of a value to this field
-                # is input less than or equal to 128 but not empty?
-                if (len(inp) > 0) and (len(inp) <= 128):
-                    # is input varchar?
-                    if isVarchar(inp) == False:
-                        # this is an invalid input
-                        print("      This is an invalid answer. Please enter an answer that does not use restricted characters.")
-                        continue
-                    # answer is of valid format; add the answer to the security 1 field
-                    security1 = security1 + " = " + inp
-                    break
-                # otherwise the input is not valid
-                else:
-                    print("      This is an invalid input. Please enter an answer less than 128 characters.")
-                    continue
-            # prompt loop for the activation of the 2nd security question
-            while(True):
-                # prompt if the user wants to add the second security question
-                print("   Would you like to add a 2nd security question? (Y/N): ", end = '')
-                inp = input()
-                inp = inp.lower()
-                # check that the user input y/n
-                if inp == 'n':
-                    # user does not need a second security questions, break out of loop
-                    break
-                elif inp == 'y':
-                    # user does want to add the second security question
-                    security2_active = True
-                    print("   Adding 2nd security question.")
-                    # prompt loop for input of the question (variable character (a-z, 0-9, symbols) value <= 128 chars)
-                    while(True):
-                        print("      Please enter the question: ", end = '')
-                        inp = input()
-                        inp = inp.lower()
-                        # enforce type constraints and require application of a value to this field
-                        # is input less than or equal to 128 but not empty?
-                        if (len(inp) > 0) and (len(inp) <= 128):
-                            # is input varchar?
-                            if isVarchar(inp) == False:
-                                # this is an invalid input
-                                print("      This is an invalid question. Please enter a question that does not use restricted characters.")
-                                continue
-                            # question is of valid format; add the question to the security 1 field
-                            security2 = inp
-                            break
-                        # otherwise the input is not valid
-                        else:
-                            print("      This is an invalid input. Please enter a security question less than 128 characters.")
-                            continue
-                    # prompt loop for input of the answer (variable character (a-z, 0-9, symbols) value <= 128 chars)
-                    while(True):
-                        print("      Please enter the answer to " + security2 +": ", end = '')
-                        inp = input()
-                        inp = inp.lower()
-                        # enforce type constraints and require application of a value to this field
-                        # is input less than or equal to 128 but not empty?
-                        if (len(inp) > 0) and (len(inp) <= 128):
-                            # is input varchar?
-                            if isVarchar(inp) == False:
-                                # this is an invalid input
-                                print("      This is an invalid answer. Please enter an answer that does not use restricted characters.")
-                                continue
-                            # answer is of valid format; add the answer to the security 2 field
-                            security2 = security2 + " = " + inp
-                            break
-                        # otherwise the input is not valid
-                        else:
-                            print("      This is an invalid input. Please enter an answer less than 128 characters.")
-                            continue
-                    # prompt loop for the activation of the 3rd security question
-                    while(True):
-                        # prompt if the user wants to add the third security question
-                        print("   Would you like to add a 3rd security question? (Y/N): ", end = '')
-                        inp = input()
-                        inp = inp.lower()
-                        # check that the user input y/n
-                        if inp == 'n':
-                            # user does not need any security questions, break out of loop
-                            break
-                        elif inp == 'y':
-                            # user does want to add the first security question
-                            security3_active = True
-                            print("   Adding 3rd security question.")
-                            # prompt loop for input of the question (variable character (a-z, 0-9, symbols) value <= 128 chars)
-                            while(True):
-                                print("      Please enter the question: ", end = '')
-                                inp = input()
-                                inp = inp.lower()
-                                # enforce type constraints and require application of a value to this field
-                                # is input less than or equal to 128 but not empty?
-                                if (len(inp) > 0) and (len(inp) <= 128):
-                                    # is input varchar?
-                                    if isVarchar(inp) == False:
-                                        # this is an invalid input
-                                        print("      This is an invalid question. Please enter a question that does not use restricted characters.")
-                                        continue
-                                    # question is of valid format; add the question to the security 1 field
-                                    security3 = inp
-                                    break
-                                # otherwise the input is not valid
-                                else:
-                                    print("      This is an invalid input. Please enter a security question less than 128 characters.")
-                                    continue
-                            # prompt loop for input of the answer (variable character (a-z, 0-9, symbols) value <= 128 chars)
-                            while(True):
-                                print("      Please enter the answer to " + security3 +": ", end = '')
-                                inp = input()
-                                inp = inp.lower()
-                                # enforce type constraints and require application of a value to this field
-                                # is input less than or equal to 128 but not empty?
-                                if (len(inp) > 0) and (len(inp) <= 128):
-                                    # is input varchar?
-                                    if isVarchar(inp) == False:
-                                        # this is an invalid input
-                                        print("      This is an invalid answer. Please enter an answer that does not use restricted characters.")
-                                        continue
-                                    # answer is of valid format; add the answer to the security 1 field
-                                    security3 = security3 + " = " + inp
-                                    break
-                                # otherwise the input is not valid
-                                else:
-                                    print("      This is an invalid input. Please enter an answer less than 128 characters.")
-                                    continue
-                        # otherwise the input is not valid
-                        else:
-                            print("   This is an invalid input. Please enter Y (yes) or N (no).")
-                            continue
-                        break
-                # otherwise the input is not valid
-                else:
-                    print("   This is an invalid input. Please enter Y (yes) or N (no).")
-                    continue
-                break
-        # otherwise the input is not valid
-        else:
-            print("   This is an invalid input. Please enter Y (yes) or N (no).")
-            continue
-        break   
-    # prompt loop for the additional info (a-z 0-9 symbols <= 2048 chars)
-    while(True):
-        # prompt the user for input of any additional info and save the input
-        # it is possible for this field to be blank
-        print("   Please enter any additional information you would like to add (not required): ", end = '')
-        inp = input()
-        # enforce type constraints
-        # is the input less than or equal to 2048?
-        if (len(inp) > 2048):
-            print("   This additional information exceeds the 2,048 character limit. Please enter a smaller value.")
-            continue
-        # is input varchar?
-        if isVarchar(inp) == False:
-            # this is an invalid input
-            print("   This additional information is invalid. Please enter info that does not use restricted characters.")
-            continue
-        # the input is valid additional information
-        # lower the input for consistency and assign it to add_info
-        inp = inp.lower()
-        add_info = inp
-        # escape prompt loop once valid additional info is given
-        break
-    # prompt for the pinned status of the set (true/false)
-    while(True):
-        # prompt the user if they would like to pin the service immediately
-        print("   Would you like to pin this set at creation? (Y/N): ", end = '')
-        inp = input()
-        inp = inp.lower()
-        # check that the user input y/n
-        if inp == 'n':
-            # user does not want to pin the set, break
-            break
-        elif inp == 'y':
-            # user does want to pin, set the pin value
-            pinned = True
-            break
-        # otherwise the input is not valid
-        else:
-            print("   This is an invalid input. Please enter Y (yes) or N (no).")
-            continue
-    # feedback the new set and all of the information to the user
-    print("You are adding a service with the following information:"
-          + "\n   Service Name: " + name + "\n      Username: " + username + "\n      Password : " + password
-          + "\n      Security questions: ", end = '')
-    if security1_active:
-        print("\n         Question 1: " + security1, end = '')
-        if security2_active:
-            print("\n         Question 2: " + security2, end = '')
-            if security3_active:
-                print("\n         Question 3: " + security3, end = '')
+
+# validateInput function
+    # checks the passed value against a pair of constraints
+    # maximum length constraint and format constraint
+        # format modes are alphanumeric and varchar
+    # forcedEntry field indicates that the length cannot be 0
+def validateInput(value, max_length, format_mode, forced_entry):
+    value = str(value)
+    print("Testing " + value + " as " + format_mode + " with length " + str(max_length) + " and requirement as " + str(forced_entry))
+    # test length of input string
+    if forced_entry:
+        # if entry is forced, length of value must be between 1 and max_length
+        if not((len(value) > 0) and (len(value) < max_length)):
+            # value does not pass length requirement
+            return False
+    # entry isn't required, 0 - max length
     else:
-        print("\n         None.", end = '')
-    print("\n      Additional information: " + add_info, end = '')
-    print("\n      Pinned: " + str(pinned))
+        if not(len(value) < max_length):
+            # value is too large
+            return False
+    # test formatting
+    # alphanumeric mode
+    if format_mode == "alphanumeric":
+        # test for alphanumeric formatting
+        if not(all(char.isalnum() or char.isspace() for char in value)):
+            # value isn't alphanumeric
+            return False
+    # varchar mode
+    else:
+        # test varchar formatting
+        if not(isVarchar(value)):
+            # value isn't varchar
+            return False
+    # both checks are passed, valid value
+    return True
+
+
+#_____________________________________________________________________________________________________
+
+## Main Component Functions
+## flow of program: addCredentialSet() -> enforceConstraints() -> writeToData()
+## addCredentialSets() will setup the UI and gather the info from the user
+## enforceConstraints() will make sure that the gathered info is valid
+## writeToData() will format the information and add it to the database file
+## segments are declared and defined in reverse order
+
+#_____________________________________________________________________________________________________
+
+
+# writeToData function
+    # takes the successful credential set;
+    # formats it to the proper data format;
+    # writes that line to the database file
+def writeToData(addCredentialScreen, user_hash, name, username, password, security1_active, security1, security2_active, security2, 
+                security3_active, security3, add_info, pinned):
     # format the gathered information into a single CSV line
     data_line_output = ""
     # start by adding the current user's hash
     # placeholder code for now
-    data_line_output += "\n" + current_user + ","
+    data_line_output += "\n" + user_hash + ","
     # service name, username, password
     data_line_output += name + "," + username + "," + password + ","
     # security questions
@@ -361,17 +112,135 @@ def addCredentialSet():
     # additional info, pinned status
     data_line_output += add_info + "," + str(pinned) + "$"
     # encrypt the line
-    # 04/02 - To Do
+    #
     # open the credentials data file
     credentials = open("credentials.txt", "a")
     # append the data to the file
     credentials.write(data_line_output)
     # close the credentials data file
     credentials.close()
-    # inform the user that the named credential set has been successfully created and added to their sets list.
-    print("Your new service " + name + " has been added to your sets. You can now access this set at any time!")
+    # close the addCredential screen
+    addCredentialScreen.withdraw()
 
-#def main():
-#    addCredentialSet()
-#
-#main()
+
+# enforceConstraints function
+    # single function call to enforce the constraints on
+    # all fields of a credential set
+def enforceConstraints(addCredentialScreen, user_hash, name, username, password, security1, security2, security3, add_info, pinned):
+    # check the name
+    if not(validateInput(name, 32, "alphanumeric", True)):
+        # return failed site name
+        tk.messagebox.showinfo("Error", "Please make sure that the site name is 1-32 characters and alphanumeric.")
+        return False
+    # check the username
+    if not(validateInput(username, 48, "varchar", True)):
+        # return failed username
+        tk.messagebox.showinfo("Error", "Please make sure that the username is 1-48 characters.")
+        return False
+    # check the password
+    if not(validateInput(password, 48, "varchar", True)):
+        # return failed password
+        tk.messagebox.showinfo("Error", "Please make sure that the password is 1-48 characters.")
+        return False
+    # check security question 1
+    if not(validateInput(security1, 256, "varchar", True)):
+        # return failed security 1
+        tk.messagebox.showinfo("Error", "Please make sure that security question 1 is 1-256 characters.")
+        return False
+    # check security question 2
+    if not(validateInput(security2, 256, "varchar", True)):
+        # return failed security 2
+        tk.messagebox.showinfo("Error", "Please make sure that security question 2 is 1-256 characters.")
+        return False
+    # check security question 3
+    if not(validateInput(security3, 256, "varchar", True)):
+        # return failed security 3
+        tk.messagebox.showinfo("Error", "Please make sure that security question 3 is 1-256 characters.")
+        return False
+    # check additional info
+    if not(validateInput(add_info, 256, "varchar", False)):
+        # return failed additional info
+        tk.messagebox.showinfo("Error", "Please make sure that the additional info is less than 2048 characters.")
+        return False
+    # all fields are passed
+    tk.messagebox.showinfo("Error", "Success\nAdding " + name + " with " + username + " and " + password + "\n" + " security questions " + security1 + ", " + security2 + ", " + security3 + "\nAdditional info: " + add_info)
+    # set the security question status fields
+    security1_active = False
+    security2_active = False
+    security3_active = False
+    if security1:
+        security1_active = True
+        if security2:
+            security2_active = True
+            if security3:
+                security3_active = True
+    # last step - format line and write to data
+    writeToData(addCredentialScreen, user_hash, name, username, password, security1_active, security1, 
+                security2_active, security2, security3_active, security3, add_info, pinned)
+
+
+# primary function (component driver, called from system driver)
+def addCredentialSet(current_user, loginScreen):    
+    # minimize previous screen
+    loginScreen.withdraw()
+    # create new window through tk; assign attributes
+    # this window is a child of (mastered by) the main login screen
+    addCredentialScreen = tk.Toplevel(loginScreen)
+    addCredentialScreen.title("Password Manager")
+    addCredentialScreen.geometry("800x450")
+    # create label for the UI
+    addCredLabel = tk.Label(addCredentialScreen, text = "Add New Credentials")
+    # package this into the UI
+    addCredLabel.pack()
+    # tell the user that they will need x data (listed above) to create the new set
+    infoLabel = tk.Label(addCredentialScreen, text = "Please have the following information ready:\n"
+        + "Service/Site name, Username, Password\n"
+        + "Any Security Questions (3 max), and Any additional information regarding the site.")
+    infoLabel.pack()
+    # prompt for the service name
+    # add service name input
+    nameLabel = tk.Label(addCredentialScreen, text = "Site Name")
+    nameLabel.pack()
+    name = tk.StringVar()
+    nameEntry = tk.Entry(addCredentialScreen, textvariable = name)
+    nameEntry.pack()
+    # prompt for the username
+    # add username input
+    usernameLabel = tk.Label(addCredentialScreen, text = "Username")
+    usernameLabel.pack()
+    username = tk.StringVar()
+    usernameEntry = tk.Entry(addCredentialScreen, textvariable = username)
+    usernameEntry.pack()
+    # prompt for the password
+    # add password input
+    passwordLabel = tk.Label(addCredentialScreen, text = "Password")
+    passwordLabel.pack()
+    password = tk.StringVar()
+    passwordEntry = tk.Entry(addCredentialScreen, textvariable = password)
+    passwordEntry.pack()
+    # security 1 radial here
+    # prompt for the input of security 1
+    # add security question input
+    security1 = "test"
+    # security 2 radial here
+    # prompt for the input of security 2
+    # add security question input
+    security2 = "test"
+    # security 3 radial here
+    # prompt for the input of security 3
+    # add security question input
+    security3 = "test"
+    # prompt for the additional information
+    # add additional info input
+    addInfoLabel = tk.Label(addCredentialScreen, text = "Additional Info")
+    addInfoLabel.pack()
+    add_info = tk.StringVar()
+    addInfoEntry = tk.Entry(addCredentialScreen, textvariable = add_info)
+    addInfoEntry.pack()
+    # pinned status radial here
+    pinned = False
+    # add credential button (finalize)
+    finalizeButton = tk.Button(addCredentialScreen, text = "Submit", 
+        command = lambda:enforceConstraints(addCredentialScreen, current_user, nameEntry.get(), usernameEntry.get(), passwordEntry.get(),
+        security1, security2, security3, addInfoEntry.get(), pinned))
+    finalizeButton.pack()

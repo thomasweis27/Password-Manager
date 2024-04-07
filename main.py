@@ -12,7 +12,7 @@ def return_to_login():
 def loginPage():
     login = tk.Tk()
     login.title("Password Manager")
-    login.geometry("400x330")
+    login.geometry("800x450")
 
     def getValue():
         oldHash = ""
