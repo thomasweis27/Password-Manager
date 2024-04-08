@@ -26,175 +26,112 @@ import tkinter as tk
 #_____________________________________________________________________________________________________
 
 ## Main Component Functions
-## flow of program: accessCredentialSets() -> termedSearch() ->
+## flow of program: accessCredentialSets() -> enforceConstraints() -> termedSearch() ->
 ## accessCredentialSets() will interface with the main system driver and get a search term
+## enforceConstraints() will make sure the search term is within the constraints of the data type
 ## termedSearch() will take the given search term and find any matches in the database file
-##
 ## segments are declared and defined in reverse order
 
 #_____________________________________________________________________________________________________
 
 
-
 # termedSearch function
     # takes a search term entered by the user;
     # queries the data file for an entry with that term in any of its fields
-def termedSearch(user_hash, accessCredentialsScreen):
-    # open the credentials file and save every line that is not commented
-    with open("credentials.txt") as file:
-        for line in file:
-            if not(line.startswith("$")):
-                print(line.rstrip())
+def termedSearch(user_hash, accessCredentialScreen, siteList, searchButton, term, user_sites):
+    # verify the search term to the user
+    tk.messagebox.showinfo("Error", "Searching for sites with " + term)
+    # clear the site list box
+    siteList.delete(0, siteList.size())
+    # lowercase the term
+    term = term.lower()
+    # set up lists that will be used to hold sites
+    matches = []
+    # check each user site
+    for site in user_sites:
+        # does the name contain the term at all
+        if (site[1].find(term)) != -1:
+            # the term is somewhere in the name; add to matches
+            matches.append(site)
+        # otherwise it doesn't match; continue to next site
+        continue
+    # add each site name to the list on screen
+    for site in matches:        
+        siteList.insert(tk.END, site[1])
+    siteList.pack()
+    # allow for change of the search term (accessCredentials <-> termedSearch segment)
+    searchButton.command = lambda:enforceConstraints(user_hash, accessCredentialScreen, 
+        siteList, searchButton, term, user_sites)
 
 
+# enforceConstraints function
+    # forces the user to input a search term that is alphanumeric and 1 - 32 chars
+def enforceConstraints(user_hash, accessCredentialScreen, siteList, searchButton, term, user_sites):
+    # check the length
+    if not((len(term) > 0) and (len(term) <= 32)):
+        # term is invalid, alert user
+        tk.messagebox.showinfo("Error", "Please enter a search term that is 1-32 characters in length.")
+        # call back to the main accessCredentials segment
+        accessCredentialScreen.withdraw()
+        accessCredentialSets(user_hash)
+    # otherwise length is fine; check format
+    elif not(all((char.isalnum()) or (char.isspace()) for char in term)):
+        # the term is not alphanumeric
+        tk.messagebox.showinfo("Error", "Please enter a search term that is alphanumeric (no special characters).")
+        # call back to the main accessCredentials segment
+        accessCredentialScreen.withdraw()
+        accessCredentialSets(user_hash)
+    # term is valid length and format, continue to search
+    else:
+        # otherwise the term is valid
+        termedSearch(user_hash, accessCredentialScreen, siteList, searchButton, term, user_sites)
 
 
-
-    # # prompt user for a search term (input loop)
-    # while(True):
-    #     print("Please enter a service name to search for: ", end = '')
-    #     inp = input()
-    #     inp = inp.upper()
-    #     # enforce format constraints
-    #     # is string alphanumeric?
-    #     if not(inp.isalnum()):
-    #         # string is not alphanumeric
-    #         # prompt user once more
-    #         print("Invalid input, please enter something different")
-    #         continue
-    #     # save and feedback the search term, lowered for consistency with the data files
-    #     searchTerm = inp.lower()
-    #     print("You are searching for '" + searchTerm + ".' Continue to search?")
-    #     # prompt for Y/N (input loop 2)
-    #     while(True):
-    #         print("  Y/N? - ", end = '')
-    #         inp = input()
-    #         inp = inp.upper()
-    #         # enforce format constraints
-    #         # is string alphabetical?
-    #         if inp.isalpha():
-    #             # is string length 1?
-    #             if len(inp) == 1:
-    #                 # confirm/cancel search
-    #                 if inp == "Y":
-    #                     print("Searching for '" + searchTerm + "'...")
-    #                     # open the credentials.txt file
-    #                     file = open("credentials.txt")
-    #                     # read lines from the file
-    #                     Lines = file.readlines()
-    #                     # read lines and save lines where the search term is found
-    #                     MatchingServices = []
-    #                     for currLine in Lines:
-    #                         print(currLine)
-    #                         # is the line commented?
-    #                         if currLine[0] == '$':
-    #                             print("  Comment line")
-    #                             # move to next line
-    #                             continue
-    #                         # not a comment; check that the hash in the line matches current user's
-    #                         # elif hash != currentUserHash:
-    #                             # continue
-    #                         # line isn't commented out and the hashes match
-    #                         else:
-    #                             # does the line's name match?
-    #                             # if there is a match for the search term
-    #                             if (currLine.find(searchTerm)) != -1:
-    #                                 # the line contains the term, add it to the return list
-    #                                 MatchingServices.append(currLine)
-    #                             else:
-    #                                 continue
-    #                     # is there anything in the Matching set?
-    #                     if not(MatchingServices):
-    #                         # alert the user that there was no matching services
-    #                         print("There were no matches found for " + searchTerm)
-    #                     else:
-    #                         # print the list of matching services
-    #                         print("Credential sets with " + searchTerm + " in their name:")
-    #                         for i in MatchingServices:
-    #                             print("   " + i)
-    #                     # close the file
-    #                     file.close()
-    #                     break
-    #                 # input must be N
-    #                 elif inp == "N":
-    #                     print("Search cancelled.")
-    #                     break
-    #                 # string is not Y/N
-    #                 else:
-    #                     # prompt user once more
-    #                     print("Invalid input, please enter Y (yes) or N (no).")
-    #                     continue
-    #             # string is too long
-    #             else:
-    #                 # prompt user once more
-    #                 print("Invalid input, please enter Y (yes) or N (no). Singular character only")
-    #                 continue
-    #         # string is not alphabetical
-    #         else:
-    #             # prompt user once more
-    #             print("Invalid input, please enter Y (yes) or N (no).")
-    #             continue
-    #     # end of first input loop
-    #     # only reachable after confirmation/cancel of search
-    #     break
-
-
-def accessCredentialSets(user_hash, loginScreen):
-    # minimize previous screen
-    loginScreen.withdraw()
+def accessCredentialSets(user_hash):
     # create new window through tk; assign attributes
-    # this window is a child of (mastered by) the main login screen
-    accessCredentialScreen = tk.Toplevel(loginScreen)
+    accessCredentialScreen = tk.Toplevel()
     accessCredentialScreen.title("Password Manager")
     accessCredentialScreen.geometry("800x450")
     # create label for the UI
     accessCredLabel = tk.Label(accessCredentialScreen, text = "Access Your Credentials")
     # package this into the UI
     accessCredLabel.pack()
-    # tell the user that they will need x data (listed above) to create the new set
-    infoLabel = tk.Label(accessCredentialScreen, text = "Please enter a search term below.\n"
-        + "Any service that includes that term will show up.")
+    # tell the user how the search will function
+    infoLabel = tk.Label(accessCredentialScreen, text = "All of your sites will appear below.\n"
+        + "To search for a specific site, enter a search term and click 'Search'.\n"
+        + "Any service that includes that term will show.")
     infoLabel.pack()
-
-
-
-
-
-    # # prompt for search
-    # while(True):
-    #     print("\nWould you like to search for a service?")
-    #     print("  Y/N? - ", end = '')
-    #     inp = input()
-    #     inp = inp.upper()
-    #     # enforce format constraints
-    #     # is string alphabetical?
-    #     if inp.isalpha():
-    #         # is string length 1?
-    #         if len(inp) == 1:
-    #             # is string Y/N?
-    #             if inp == "Y" or inp == "N":
-    #                 # confirm/cancel search
-    #                 if inp == "Y":
-    #                     termedSearch()
-    #                 # input must be N
-    #                 else:
-    #                     print("\nNot searching. Closing system.")
-    #                     break
-    #             # string is not Y/N
-    #             else:
-    #                 # prompt user once more
-    #                 print("Invalid input, please enter Y (yes) or N (no).")
-    #                 continue
-    #         # string is too long
-    #         else:
-    #             # prompt user once more
-    #             print("Invalid input, please enter Y (yes) or N (no). Singular character only")
-    #             continue
-    #     # string is not alphabetical
-    #     else:
-    #         # prompt user once more
-    #         print("Invalid input, please enter Y (yes) or N (no).")
-    #         continue
-    #     # reached only if proper input has been enforced and carried out
-    #     break
-    
+    # get the search term from the user
+    searchbarLabel = tk.Label(accessCredentialScreen, text = "Enter a term: ")
+    searchbarLabel.pack()
+    searchterm = tk.StringVar()
+    searchtermEntry = tk.Entry(accessCredentialScreen, textvariable = searchterm)
+    searchtermEntry.pack()
+    # search button
+    searchButton = tk.Button(accessCredentialScreen, text = "Search", 
+        command = lambda:enforceConstraints(user_hash, accessCredentialScreen, 
+        siteList, searchButton, searchtermEntry.get(), user_sites))
+    searchButton.pack()
+    # create the site list element
+    siteList = tk.Listbox(accessCredentialScreen)
+    # add every one of the user's sites to the sitelist element
+    user_sites = []
+    # open the credentials file
+    with open("credentials.txt") as file:
+        for line in file:
+            # remove any commented lines
+            if not(line.startswith("$")):
+                # check the hash
+                split_line = line.split(",")
+                if split_line[0] == user_hash:
+                    # the hash matches, add to the list of user sites
+                    print(line.rstrip())
+                    user_sites.append(split_line)
+                # otherwise the hashes don't match; continue to next site
+                continue
+    # close the file
+    file.close()
+    # add each site name to the list on screen
+    for site in user_sites:        
+        siteList.insert(tk.END, site[1])
+    siteList.pack()
