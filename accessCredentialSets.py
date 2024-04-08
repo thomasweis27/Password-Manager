@@ -12,6 +12,10 @@
         # replacing proof-of-concept console ui with Tkinter
         # fixing component flow to work with main system
         # TO DO: finish up the UI implementation. Works for now but no functionality
+# 04/08 - More UI functionality
+        # TO DO: allow user to select sites and pop-up the credential info.
+            # possibly needs a new module
+        # Fix issue with search term case sensitivity and consecutivity.
 
 #_____________________________________________________________________________________________________
 
