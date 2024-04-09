@@ -28,6 +28,15 @@ import tkinter as tk
 #_____________________________________________________________________________________________________
 
 
+# returnToPrevious function
+    # allows user to return to the previous screen
+def returnToPrevious(currentWindow, previousWindow):
+    # minimize the current window
+    currentWindow.withdraw()
+    # show the previous window
+    previousWindow.deiconify()
+
+
 # isVarchar function
     # checks that the passed value (string) is a varchar
 def isVarchar(string):
@@ -98,6 +107,16 @@ def validateInput(value, max_length, format_mode, forced_entry):
     # writes that line to the database file
 def writeToData(addCredentialScreen, user_hash, name, username, password, security1_active, security1, security2_active, security2, 
                 security3_active, security3, add_info, pinned):
+    # force the entire input into a lowercase form
+    # the boolean value fields (security questions active & pinned status) can't be;
+    # True and False must be capitalized
+    name = name.lower()
+    username = username.lower()
+    password = password.lower()
+    security1 = security1.lower()
+    security2 = security2.lower()
+    security3 = security3.lower()
+    add_info = add_info.lower()
     # format the gathered information into a single CSV line
     data_line_output = ""
     # start by adding the current user's hash
@@ -119,8 +138,6 @@ def writeToData(addCredentialScreen, user_hash, name, username, password, securi
     credentials.write(data_line_output)
     # close the credentials data file
     credentials.close()
-    # close the addCredential screen
-    addCredentialScreen.withdraw()
 
 
 # enforceConstraints function
@@ -180,12 +197,11 @@ def enforceConstraints(addCredentialScreen, user_hash, name, username, password,
 
 
 # primary function (component driver, called from system driver)
-def addCredentialSet(current_user, loginScreen):    
+def addCredentialSet(current_user, previousWindow):    
     # minimize previous screen
-    loginScreen.withdraw()
+    previousWindow.withdraw()
     # create new window through tk; assign attributes
-    # this window is a child of (mastered by) the main login screen
-    addCredentialScreen = tk.Toplevel(loginScreen)
+    addCredentialScreen = tk.Tk()
     addCredentialScreen.title("Password Manager")
     addCredentialScreen.geometry("800x450")
     # create label for the UI
@@ -244,3 +260,7 @@ def addCredentialSet(current_user, loginScreen):
         command = lambda:enforceConstraints(addCredentialScreen, current_user, nameEntry.get(), usernameEntry.get(), passwordEntry.get(),
         security1, security2, security3, addInfoEntry.get(), pinned))
     finalizeButton.pack()
+    # return to previous screen
+    returnButton = tk.Button(addCredentialScreen, text = "<- Back", 
+        command = lambda:returnToPrevious(addCredentialScreen, previousWindow))
+    returnButton.pack(side = tk.BOTTOM)

@@ -19,12 +19,21 @@
 
 #_____________________________________________________________________________________________________
 
-import os
+
 import tkinter as tk
 
 ## helper functions of this component
 
 #_____________________________________________________________________________________________________
+
+
+# returnToPrevious function
+    # allows user to return to the previous screen
+def returnToPrevious(currentWindow, previousWindow):
+    # minimize the current window
+    currentWindow.withdraw()
+    # show the previous window
+    previousWindow.deiconify()
 
 
 #_____________________________________________________________________________________________________
@@ -42,7 +51,7 @@ import tkinter as tk
 # termedSearch function
     # takes a search term entered by the user;
     # queries the data file for an entry with that term in any of its fields
-def termedSearch(user_hash, accessCredentialScreen, siteList, searchButton, term, user_sites):
+def termedSearch(user_hash, previousWindow, siteList, searchButton, term, user_sites):
     # verify the search term to the user
     tk.messagebox.showinfo("Error", "Searching for sites with " + term)
     # clear the site list box
@@ -64,36 +73,36 @@ def termedSearch(user_hash, accessCredentialScreen, siteList, searchButton, term
         siteList.insert(tk.END, site[1])
     siteList.pack()
     # allow for change of the search term (accessCredentials <-> termedSearch segment)
-    searchButton.command = lambda:enforceConstraints(user_hash, accessCredentialScreen, 
-        siteList, searchButton, term, user_sites)
+    searchButton.command = lambda:enforceConstraints(user_hash, previousWindow, 
+        previousWindow, siteList, searchButton, term, user_sites)
 
 
 # enforceConstraints function
     # forces the user to input a search term that is alphanumeric and 1 - 32 chars
-def enforceConstraints(user_hash, accessCredentialScreen, siteList, searchButton, term, user_sites):
+def enforceConstraints(user_hash, previousWindow, siteList, searchButton, term, user_sites):
     # check the length
     if not((len(term) > 0) and (len(term) <= 32)):
         # term is invalid, alert user
         tk.messagebox.showinfo("Error", "Please enter a search term that is 1-32 characters in length.")
         # call back to the main accessCredentials segment
-        accessCredentialScreen.withdraw()
-        accessCredentialSets(user_hash)
+        accessCredentialSets(user_hash, previousWindow)
     # otherwise length is fine; check format
     elif not(all((char.isalnum()) or (char.isspace()) for char in term)):
         # the term is not alphanumeric
         tk.messagebox.showinfo("Error", "Please enter a search term that is alphanumeric (no special characters).")
         # call back to the main accessCredentials segment
-        accessCredentialScreen.withdraw()
-        accessCredentialSets(user_hash)
+        accessCredentialSets(user_hash, previousWindow)
     # term is valid length and format, continue to search
     else:
         # otherwise the term is valid
-        termedSearch(user_hash, accessCredentialScreen, siteList, searchButton, term, user_sites)
+        termedSearch(user_hash, previousWindow, siteList, searchButton, term, user_sites)
 
 
-def accessCredentialSets(user_hash):
+def accessCredentialSets(user_hash, previousWindow):
+    # close previous window
+    previousWindow.withdraw()
     # create new window through tk; assign attributes
-    accessCredentialScreen = tk.Toplevel()
+    accessCredentialScreen = tk.Tk()
     accessCredentialScreen.title("Password Manager")
     accessCredentialScreen.geometry("800x450")
     # create label for the UI
@@ -113,9 +122,13 @@ def accessCredentialSets(user_hash):
     searchtermEntry.pack()
     # search button
     searchButton = tk.Button(accessCredentialScreen, text = "Search", 
-        command = lambda:enforceConstraints(user_hash, accessCredentialScreen, 
+        command = lambda:enforceConstraints(user_hash, previousWindow, 
         siteList, searchButton, searchtermEntry.get(), user_sites))
     searchButton.pack()
+    # clear search button
+    clearButton = tk.Button(accessCredentialScreen, text = "Clear", 
+        command = lambda:accessCredentialSets(user_hash, previousWindow))
+    clearButton.pack()
     # create the site list element
     siteList = tk.Listbox(accessCredentialScreen)
     # add every one of the user's sites to the sitelist element
@@ -139,3 +152,7 @@ def accessCredentialSets(user_hash):
     for site in user_sites:        
         siteList.insert(tk.END, site[1])
     siteList.pack()
+    # return to previous screen
+    returnButton = tk.Button(accessCredentialScreen, text = "<- Back", 
+        command = lambda:returnToPrevious(accessCredentialScreen, previousWindow))
+    returnButton.pack(side = tk.BOTTOM)

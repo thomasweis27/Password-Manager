@@ -25,8 +25,8 @@ def credentialsMainScreen(enteredPassword, currentHash, oldHash, login):
     frmSideBar.grid(row=0, column=0)
 
     mainBtn = tk.Button(master = frmSideBar, text = "Main", width=10, height=2)
-    searchBtn = tk.Button(master = frmSideBar, text = "Search", height=2, command=lambda: accessCredentialSets(currentHash))
-    addBtn = tk.Button(master = frmSideBar, text = "Add", height=2, command=lambda: addCredentialSet(currentHash, login))
+    searchBtn = tk.Button(master = frmSideBar, text = "Search", height=2, command=lambda: accessCredentialSets(currentHash, window))
+    addBtn = tk.Button(master = frmSideBar, text = "Add", height=2, command=lambda: addCredentialSet(currentHash, window))
     editBtn = tk.Button(master = frmSideBar, text = "Edit", height=2)
     accountBtn = tk.Button(master = frmSideBar, text = "Button", height=2)
     logoutBtn = tk.Button(master = frmSideBar, text = "Logout", height=2, command=lambda: logout(login, window))
