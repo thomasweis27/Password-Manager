@@ -18,6 +18,10 @@
         # broken into 3 main segments
         # TO DO: need to add radial buttons for security questions and inputs;
             # pinned status as well
+# 04/09 - More UI Implementation;
+        # All UI elements present. Full functionality
+        # TO DO: fix issues with security questions clearing even with values
+            # fix functionality of pinned radial button
 
 #_____________________________________________________________________________________________________
 
@@ -35,6 +39,15 @@ def returnToPrevious(currentWindow, previousWindow):
     currentWindow.withdraw()
     # show the previous window
     previousWindow.deiconify()
+
+
+# clearInformation function
+    # fixes issue with duplication of addCredential window upon clearing input
+def clearInformation(user_hash, previousWindow, addCredentialScreen):
+    # withdraw the existing addCredential window
+    addCredentialScreen.withdraw()
+    # call back to the beginning of the addCredential component
+    addCredentialSet(user_hash, previousWindow)
 
 
 # isVarchar function
@@ -92,8 +105,9 @@ def validateInput(value, max_length, format_mode, forced_entry):
 #_____________________________________________________________________________________________________
 
 ## Main Component Functions
-## flow of program: addCredentialSet() -> enforceConstraints() -> writeToData()
-## addCredentialSets() will setup the UI and gather the info from the user
+## flow of program: addCredentialSet() -> gatherInfo() -> enforceConstraints() -> writeToData()
+## addCredentialSets() will setup the UI
+## gatherInfo() separates UI initialization from gathering of user info
 ## enforceConstraints() will make sure that the gathered info is valid
 ## writeToData() will format the information and add it to the database file
 ## segments are declared and defined in reverse order
@@ -105,8 +119,8 @@ def validateInput(value, max_length, format_mode, forced_entry):
     # takes the successful credential set;
     # formats it to the proper data format;
     # writes that line to the database file
-def writeToData(addCredentialScreen, user_hash, name, username, password, security1_active, security1, security2_active, security2, 
-                security3_active, security3, add_info, pinned):
+def writeToData(user_hash, name, username, password, security1_active, security1, 
+        security2_active, security2, security3_active, security3, add_info, pinned):
     # force the entire input into a lowercase form
     # the boolean value fields (security questions active & pinned status) can't be;
     # True and False must be capitalized
@@ -143,7 +157,9 @@ def writeToData(addCredentialScreen, user_hash, name, username, password, securi
 # enforceConstraints function
     # single function call to enforce the constraints on
     # all fields of a credential set
-def enforceConstraints(addCredentialScreen, user_hash, name, username, password, security1, security2, security3, add_info, pinned):
+def enforceConstraints(user_hash, name, username, password, 
+    security1question, security1answer, security2question, security2answer, 
+    security3question, security3answer, add_info, pinned):
     # check the name
     if not(validateInput(name, 32, "alphanumeric", True)):
         # return failed site name
@@ -160,19 +176,34 @@ def enforceConstraints(addCredentialScreen, user_hash, name, username, password,
         tk.messagebox.showinfo("Error", "Please make sure that the password is 1-48 characters.")
         return False
     # check security question 1
-    if not(validateInput(security1, 256, "varchar", True)):
+    if not(validateInput(security1question, 128, "varchar", False)):
         # return failed security 1
-        tk.messagebox.showinfo("Error", "Please make sure that security question 1 is 1-256 characters.")
+        tk.messagebox.showinfo("Error", "Please make sure that security question 1 is 0-128 characters.")
+        return False
+    # check security answer 1
+    if not(validateInput(security1answer, 128, "varchar", False)):
+        # return failed security 1
+        tk.messagebox.showinfo("Error", "Please make sure that security answer 1 is 0-128 characters.")
         return False
     # check security question 2
-    if not(validateInput(security2, 256, "varchar", True)):
+    if not(validateInput(security2question, 128, "varchar", False)):
         # return failed security 2
-        tk.messagebox.showinfo("Error", "Please make sure that security question 2 is 1-256 characters.")
+        tk.messagebox.showinfo("Error", "Please make sure that security question 2 is 0-128 characters.")
+        return False
+    # check security answer 2
+    if not(validateInput(security2answer, 128, "varchar", False)):
+        # return failed security 2
+        tk.messagebox.showinfo("Error", "Please make sure that security answer 2 is 0-128 characters.")
         return False
     # check security question 3
-    if not(validateInput(security3, 256, "varchar", True)):
+    if not(validateInput(security3question, 128, "varchar", False)):
         # return failed security 3
-        tk.messagebox.showinfo("Error", "Please make sure that security question 3 is 1-256 characters.")
+        tk.messagebox.showinfo("Error", "Please make sure that security question 3 is 0-128 characters.")
+        return False
+    # check security answer 3
+    if not(validateInput(security3answer, 128, "varchar", False)):
+        # return failed security 3
+        tk.messagebox.showinfo("Error", "Please make sure that security answer 3 is 0-128 characters.")
         return False
     # check additional info
     if not(validateInput(add_info, 256, "varchar", False)):
@@ -180,39 +211,38 @@ def enforceConstraints(addCredentialScreen, user_hash, name, username, password,
         tk.messagebox.showinfo("Error", "Please make sure that the additional info is less than 2048 characters.")
         return False
     # all fields are passed
-    tk.messagebox.showinfo("Error", "Success\nAdding " + name + " with " + username + " and " + password + "\n" + " security questions " + security1 + ", " + security2 + ", " + security3 + "\nAdditional info: " + add_info)
-    # set the security question status fields
-    security1_active = False
-    security2_active = False
-    security3_active = False
-    if security1:
+    # process security questions
+    if security1question:
+        security1 = security1question + " = " + security1answer
         security1_active = True
-        if security2:
-            security2_active = True
-            if security3:
-                security3_active = True
+    else:
+        security1 = ""
+        security1_active = False
+    if security2question:
+        security2 = security2question + " = " + security2answer
+        security2_active = True
+    else:
+        security2 = ""
+        security2_active = False
+    if security3question:
+        security3 = security3question + " = " + security3answer
+        security3_active = True
+    else:
+        security3 = ""
+        security3_active = False
+    # show the user their new credential set
+    tk.messagebox.showinfo("Error", "Success\nAdding " + name + " with " + username + " and " + password + "\n" + " security questions " + security1 + ", " + security2 + ", " + security3 + "\nAdditional info: " + add_info)
     # last step - format line and write to data
-    writeToData(addCredentialScreen, user_hash, name, username, password, security1_active, security1, 
-                security2_active, security2, security3_active, security3, add_info, pinned)
+    writeToData(user_hash, name, username, password, security1_active, security1, 
+        security2_active, security2, security3_active, security3, add_info, pinned)
 
 
-# primary function (component driver, called from system driver)
-def addCredentialSet(current_user, previousWindow):    
-    # minimize previous screen
-    previousWindow.withdraw()
-    # create new window through tk; assign attributes
-    addCredentialScreen = tk.Tk()
-    addCredentialScreen.title("Password Manager")
-    addCredentialScreen.geometry("800x450")
-    # create label for the UI
-    addCredLabel = tk.Label(addCredentialScreen, text = "Add New Credentials")
-    # package this into the UI
-    addCredLabel.pack()
-    # tell the user that they will need x data (listed above) to create the new set
-    infoLabel = tk.Label(addCredentialScreen, text = "Please have the following information ready:\n"
-        + "Service/Site name, Username, Password\n"
-        + "Any Security Questions (3 max), and Any additional information regarding the site.")
-    infoLabel.pack()
+# gatherInformation function
+    # separates the gathering of information from the initialization
+    # prompts the user for information regarding their new set
+def gatherInformation(user_hash, previousWindow, addCredentialScreen):
+    # intialize the security question and pinned status flags
+    pinned = False
     # prompt for the service name
     # add service name input
     nameLabel = tk.Label(addCredentialScreen, text = "Site Name")
@@ -234,18 +264,33 @@ def addCredentialSet(current_user, previousWindow):
     password = tk.StringVar()
     passwordEntry = tk.Entry(addCredentialScreen, textvariable = password)
     passwordEntry.pack()
-    # security 1 radial here
-    # prompt for the input of security 1
-    # add security question input
-    security1 = "test"
-    # security 2 radial here
-    # prompt for the input of security 2
-    # add security question input
-    security2 = "test"
-    # security 3 radial here
-    # prompt for the input of security 3
-    # add security question input
-    security3 = "test"
+    # prompt for security 1
+    security1Label = tk.Label(addCredentialScreen, text = "Enter Security Question & Answer (opt)")
+    security1Label.pack()
+    security1question = tk.StringVar()
+    security1answer = tk.StringVar()
+    security1questionEntry = tk.Entry(addCredentialScreen, textvariable = security1question)
+    security1answerEntry = tk.Entry(addCredentialScreen, textvariable = security1answer)
+    security1questionEntry.pack()
+    security1answerEntry.pack()
+    # prompt for security 2
+    security2Label = tk.Label(addCredentialScreen, text = "Enter 2nd Security Question & Answer (opt)")
+    security2Label.pack()
+    security2question = tk.StringVar()
+    security2answer = tk.StringVar()
+    security2questionEntry = tk.Entry(addCredentialScreen, textvariable = security2question)
+    security2answerEntry = tk.Entry(addCredentialScreen, textvariable = security2answer)
+    security2questionEntry.pack()
+    security2answerEntry.pack()
+    # prompt for security 3
+    security3Label = tk.Label(addCredentialScreen, text = "Enter 3rd Security Question & Answer (opt)")
+    security3Label.pack()
+    security3question = tk.StringVar()
+    security3answer = tk.StringVar()
+    security3questionEntry = tk.Entry(addCredentialScreen, textvariable = security3question)
+    security3answerEntry = tk.Entry(addCredentialScreen, textvariable = security3answer)
+    security3questionEntry.pack()
+    security3answerEntry.pack()
     # prompt for the additional information
     # add additional info input
     addInfoLabel = tk.Label(addCredentialScreen, text = "Additional Info")
@@ -254,13 +299,38 @@ def addCredentialSet(current_user, previousWindow):
     addInfoEntry = tk.Entry(addCredentialScreen, textvariable = add_info)
     addInfoEntry.pack()
     # pinned status radial here
-    pinned = False
+    pinnedButton = tk.Radiobutton(addCredentialScreen, text = "Pin Set on Creation?",
+        value = 0, variable = pinned)
+    pinnedButton.pack()
     # add credential button (finalize)
     finalizeButton = tk.Button(addCredentialScreen, text = "Submit", 
-        command = lambda:enforceConstraints(addCredentialScreen, current_user, nameEntry.get(), usernameEntry.get(), passwordEntry.get(),
-        security1, security2, security3, addInfoEntry.get(), pinned))
+        command = lambda:enforceConstraints(user_hash, 
+        nameEntry.get(), usernameEntry.get(), passwordEntry.get(),
+        security1question.get(), security1answer.get(), security2question.get(), security2answer.get(), 
+        security3question.get(), security3answer.get(), addInfoEntry.get(), pinned))
     finalizeButton.pack()
+    # add clear button
+    clearButton = tk.Button(addCredentialScreen, text = "Clear",
+        command = lambda:clearInformation(user_hash, previousWindow, addCredentialScreen))
+    clearButton.pack()
+
+
+
+# primary function (component driver, called from system driver)
+def addCredentialSet(user_hash, previousWindow):    
+    # minimize previous screen
+    previousWindow.withdraw()
+    # create new window through tk; assign attributes
+    addCredentialScreen = tk.Tk()
+    addCredentialScreen.title("Password Manager")
+    addCredentialScreen.geometry("800x675")
+    # create label for the UI
+    addCredLabel = tk.Label(addCredentialScreen, text = "Add New Credentials")
+    # package this into the UI
+    addCredLabel.pack()
     # return to previous screen
     returnButton = tk.Button(addCredentialScreen, text = "<- Back", 
         command = lambda:returnToPrevious(addCredentialScreen, previousWindow))
     returnButton.pack(side = tk.BOTTOM)
+    # move to next segment (gather info)
+    gatherInformation(user_hash, previousWindow, addCredentialScreen)

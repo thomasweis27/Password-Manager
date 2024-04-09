@@ -16,6 +16,10 @@
         # TO DO: allow user to select sites and pop-up the credential info.
             # possibly needs a new module
         # Fix issue with search term case sensitivity and consecutivity.
+# 04/09 - Even More UI
+        # Broke down the screens to allow for better & faster UI
+        # Fixes for case sensitivity and consecutivity on searches
+        # TO DO: Still need to set up selection and set information screen
 
 #_____________________________________________________________________________________________________
 
@@ -36,11 +40,22 @@ def returnToPrevious(currentWindow, previousWindow):
     previousWindow.deiconify()
 
 
+# clearSearch function
+    # fixes issue with duplication of accessCredential window upon clearing search
+def clearSearch(user_hash, previousWindow, accessCredentialScreen):
+    # withdraw the existing accessCredential window
+    accessCredentialScreen.withdraw()
+    # call back to the beginning of the accessCredential component
+    accessCredentialSets(user_hash, previousWindow)
+
+
 #_____________________________________________________________________________________________________
 
 ## Main Component Functions
-## flow of program: accessCredentialSets() -> enforceConstraints() -> termedSearch() ->
-## accessCredentialSets() will interface with the main system driver and get a search term
+## flow of program: accessCredentialSets() -> searchCredentials() -> 
+##      enforceConstraints() -> termedSearch() <-> enforceCredentials()
+## accessCredentialSets() will interface with the main system driver
+## searchCredentials() will get a search term from the user and separate searching from initializing
 ## enforceConstraints() will make sure the search term is within the constraints of the data type
 ## termedSearch() will take the given search term and find any matches in the database file
 ## segments are declared and defined in reverse order
@@ -51,7 +66,7 @@ def returnToPrevious(currentWindow, previousWindow):
 # termedSearch function
     # takes a search term entered by the user;
     # queries the data file for an entry with that term in any of its fields
-def termedSearch(user_hash, previousWindow, siteList, searchButton, term, user_sites):
+def termedSearch(user_hash, previousWindow, accessCredentialScreen, siteList, searchButton, term, user_sites):
     # verify the search term to the user
     tk.messagebox.showinfo("Error", "Searching for sites with " + term)
     # clear the site list box
@@ -72,48 +87,38 @@ def termedSearch(user_hash, previousWindow, siteList, searchButton, term, user_s
     for site in matches:        
         siteList.insert(tk.END, site[1])
     siteList.pack()
-    # allow for change of the search term (accessCredentials <-> termedSearch segment)
+    # allow for change of the search term (searchCredentials <-> termedSearch segment)
     searchButton.command = lambda:enforceConstraints(user_hash, previousWindow, 
-        previousWindow, siteList, searchButton, term, user_sites)
+        accessCredentialScreen, siteList, searchButton, term, user_sites)
+    searchButton.pack()
 
 
 # enforceConstraints function
     # forces the user to input a search term that is alphanumeric and 1 - 32 chars
-def enforceConstraints(user_hash, previousWindow, siteList, searchButton, term, user_sites):
+def enforceConstraints(user_hash, previousWindow, accessCredentialScreen, siteList, searchButton, term, user_sites):
     # check the length
     if not((len(term) > 0) and (len(term) <= 32)):
         # term is invalid, alert user
         tk.messagebox.showinfo("Error", "Please enter a search term that is 1-32 characters in length.")
-        # call back to the main accessCredentials segment
-        accessCredentialSets(user_hash, previousWindow)
+        # call back to the searchCredentials segment
+        accessCredentialSets(user_hash, previousWindow, accessCredentialScreen)
     # otherwise length is fine; check format
     elif not(all((char.isalnum()) or (char.isspace()) for char in term)):
         # the term is not alphanumeric
         tk.messagebox.showinfo("Error", "Please enter a search term that is alphanumeric (no special characters).")
-        # call back to the main accessCredentials segment
-        accessCredentialSets(user_hash, previousWindow)
+        # call back to the searchCredentials segment
+        accessCredentialSets(user_hash, previousWindow, accessCredentialScreen)
     # term is valid length and format, continue to search
     else:
         # otherwise the term is valid
-        termedSearch(user_hash, previousWindow, siteList, searchButton, term, user_sites)
+        termedSearch(user_hash, previousWindow, accessCredentialScreen, siteList, searchButton, term, user_sites)
 
 
-def accessCredentialSets(user_hash, previousWindow):
-    # close previous window
-    previousWindow.withdraw()
-    # create new window through tk; assign attributes
-    accessCredentialScreen = tk.Tk()
-    accessCredentialScreen.title("Password Manager")
-    accessCredentialScreen.geometry("800x450")
-    # create label for the UI
-    accessCredLabel = tk.Label(accessCredentialScreen, text = "Access Your Credentials")
-    # package this into the UI
-    accessCredLabel.pack()
-    # tell the user how the search will function
-    infoLabel = tk.Label(accessCredentialScreen, text = "All of your sites will appear below.\n"
-        + "To search for a specific site, enter a search term and click 'Search'.\n"
-        + "Any service that includes that term will show.")
-    infoLabel.pack()
+# searchCredentials function
+    # establishes the ability to search with the button;
+    # separates the initialization of the window from the
+    # repeatable search function.
+def searchCredentials(user_hash, previousWindow, accessCredentialScreen):
     # get the search term from the user
     searchbarLabel = tk.Label(accessCredentialScreen, text = "Enter a term: ")
     searchbarLabel.pack()
@@ -123,11 +128,11 @@ def accessCredentialSets(user_hash, previousWindow):
     # search button
     searchButton = tk.Button(accessCredentialScreen, text = "Search", 
         command = lambda:enforceConstraints(user_hash, previousWindow, 
-        siteList, searchButton, searchtermEntry.get(), user_sites))
+        accessCredentialScreen, siteList, searchButton, searchtermEntry.get(), user_sites))
     searchButton.pack()
     # clear search button
     clearButton = tk.Button(accessCredentialScreen, text = "Clear", 
-        command = lambda:accessCredentialSets(user_hash, previousWindow))
+        command = lambda:clearSearch(user_hash, previousWindow, accessCredentialScreen))
     clearButton.pack()
     # create the site list element
     siteList = tk.Listbox(accessCredentialScreen)
@@ -152,6 +157,29 @@ def accessCredentialSets(user_hash, previousWindow):
     for site in user_sites:        
         siteList.insert(tk.END, site[1])
     siteList.pack()
+
+
+# accessCredentialSets function
+    # initial functionality of this component
+    # establishes windows, base ui, etc.
+def accessCredentialSets(user_hash, previousWindow):
+    # close previous window
+    previousWindow.withdraw()
+    # create new window through tk; assign attributes
+    accessCredentialScreen = tk.Tk()
+    accessCredentialScreen.title("Password Manager")
+    accessCredentialScreen.geometry("800x450")
+    # create label for the UI
+    accessCredLabel = tk.Label(accessCredentialScreen, text = "Access Your Credentials")
+    # package this into the UI
+    accessCredLabel.pack()
+    # tell the user how the search will function
+    infoLabel = tk.Label(accessCredentialScreen, text = "All of your sites will appear below.\n"
+        + "To search for a specific site, enter a search term and click 'Search'.\n"
+        + "Any service that includes that term will show.")
+    infoLabel.pack()
+    # move to next segment, searchCredentials
+    searchCredentials(user_hash, previousWindow, accessCredentialScreen)
     # return to previous screen
     returnButton = tk.Button(accessCredentialScreen, text = "<- Back", 
         command = lambda:returnToPrevious(accessCredentialScreen, previousWindow))
