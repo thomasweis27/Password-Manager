@@ -22,6 +22,8 @@
         # All UI elements present. Full functionality
         # TO DO: fix issues with security questions clearing even with values
             # fix functionality of pinned radial button
+# 04/09-2 - Fixes for security question issues
+        #
 
 #_____________________________________________________________________________________________________
 
@@ -73,7 +75,6 @@ def isVarchar(string):
     # forcedEntry field indicates that the length cannot be 0
 def validateInput(value, max_length, format_mode, forced_entry):
     value = str(value)
-    print("Testing " + value + " as " + format_mode + " with length " + str(max_length) + " and requirement as " + str(forced_entry))
     # test length of input string
     if forced_entry:
         # if entry is forced, length of value must be between 1 and max_length
@@ -102,6 +103,14 @@ def validateInput(value, max_length, format_mode, forced_entry):
     return True
 
 
+def pinnedStatusToggle(pinned_status):
+    if pinned_status.get() == False:
+        pinned_status.set(True)
+    else:
+        pinned_status.set(False)
+    print(pinned_status.get())
+
+
 #_____________________________________________________________________________________________________
 
 ## Main Component Functions
@@ -120,7 +129,7 @@ def validateInput(value, max_length, format_mode, forced_entry):
     # formats it to the proper data format;
     # writes that line to the database file
 def writeToData(user_hash, name, username, password, security1_active, security1, 
-        security2_active, security2, security3_active, security3, add_info, pinned):
+        security2_active, security2, security3_active, security3, add_info, pinned_status):
     # force the entire input into a lowercase form
     # the boolean value fields (security questions active & pinned status) can't be;
     # True and False must be capitalized
@@ -143,7 +152,7 @@ def writeToData(user_hash, name, username, password, security1_active, security1
     data_line_output += str(security2_active) + "," + security2 + ","
     data_line_output += str(security3_active) + "," + security3 + ","
     # additional info, pinned status
-    data_line_output += add_info + "," + str(pinned) + "$"
+    data_line_output += add_info + "," + str(pinned_status) + "$"
     # encrypt the line
     #
     # open the credentials data file
@@ -159,7 +168,7 @@ def writeToData(user_hash, name, username, password, security1_active, security1
     # all fields of a credential set
 def enforceConstraints(user_hash, name, username, password, 
     security1question, security1answer, security2question, security2answer, 
-    security3question, security3answer, add_info, pinned):
+    security3question, security3answer, add_info, pinned_status):
     # check the name
     if not(validateInput(name, 32, "alphanumeric", True)):
         # return failed site name
@@ -206,7 +215,7 @@ def enforceConstraints(user_hash, name, username, password,
         tk.messagebox.showinfo("Error", "Please make sure that security answer 3 is 0-128 characters.")
         return False
     # check additional info
-    if not(validateInput(add_info, 256, "varchar", False)):
+    if not(validateInput(add_info, 2048, "varchar", False)):
         # return failed additional info
         tk.messagebox.showinfo("Error", "Please make sure that the additional info is less than 2048 characters.")
         return False
@@ -230,19 +239,21 @@ def enforceConstraints(user_hash, name, username, password,
     else:
         security3 = ""
         security3_active = False
+    # process pinned_status flag
+    print("At Input Processing: pinned_status = " + str(pinned_status))
     # show the user their new credential set
-    tk.messagebox.showinfo("Error", "Success\nAdding " + name + " with " + username + " and " + password + "\n" + " security questions " + security1 + ", " + security2 + ", " + security3 + "\nAdditional info: " + add_info)
+    tk.messagebox.showinfo("Error", "Success\nAdding " + name + " with " + username + " and " 
+        + password + "\n" + " security questions " + security1 + ", " + security2 + ", " 
+        + security3 + "\nAdditional info: " + add_info + "\nPinned: " + str(pinned_status))
     # last step - format line and write to data
     writeToData(user_hash, name, username, password, security1_active, security1, 
-        security2_active, security2, security3_active, security3, add_info, pinned)
+        security2_active, security2, security3_active, security3, add_info, pinned_status)
 
 
 # gatherInformation function
     # separates the gathering of information from the initialization
     # prompts the user for information regarding their new set
 def gatherInformation(user_hash, previousWindow, addCredentialScreen):
-    # intialize the security question and pinned status flags
-    pinned = False
     # prompt for the service name
     # add service name input
     nameLabel = tk.Label(addCredentialScreen, text = "Site Name")
@@ -270,8 +281,8 @@ def gatherInformation(user_hash, previousWindow, addCredentialScreen):
     security1question = tk.StringVar()
     security1answer = tk.StringVar()
     security1questionEntry = tk.Entry(addCredentialScreen, textvariable = security1question)
-    security1answerEntry = tk.Entry(addCredentialScreen, textvariable = security1answer)
     security1questionEntry.pack()
+    security1answerEntry = tk.Entry(addCredentialScreen, textvariable = security1answer)
     security1answerEntry.pack()
     # prompt for security 2
     security2Label = tk.Label(addCredentialScreen, text = "Enter 2nd Security Question & Answer (opt)")
@@ -279,8 +290,8 @@ def gatherInformation(user_hash, previousWindow, addCredentialScreen):
     security2question = tk.StringVar()
     security2answer = tk.StringVar()
     security2questionEntry = tk.Entry(addCredentialScreen, textvariable = security2question)
-    security2answerEntry = tk.Entry(addCredentialScreen, textvariable = security2answer)
     security2questionEntry.pack()
+    security2answerEntry = tk.Entry(addCredentialScreen, textvariable = security2answer)
     security2answerEntry.pack()
     # prompt for security 3
     security3Label = tk.Label(addCredentialScreen, text = "Enter 3rd Security Question & Answer (opt)")
@@ -288,8 +299,8 @@ def gatherInformation(user_hash, previousWindow, addCredentialScreen):
     security3question = tk.StringVar()
     security3answer = tk.StringVar()
     security3questionEntry = tk.Entry(addCredentialScreen, textvariable = security3question)
-    security3answerEntry = tk.Entry(addCredentialScreen, textvariable = security3answer)
     security3questionEntry.pack()
+    security3answerEntry = tk.Entry(addCredentialScreen, textvariable = security3answer)
     security3answerEntry.pack()
     # prompt for the additional information
     # add additional info input
@@ -299,15 +310,19 @@ def gatherInformation(user_hash, previousWindow, addCredentialScreen):
     addInfoEntry = tk.Entry(addCredentialScreen, textvariable = add_info)
     addInfoEntry.pack()
     # pinned status radial here
-    pinnedButton = tk.Radiobutton(addCredentialScreen, text = "Pin Set on Creation?",
-        value = 0, variable = pinned)
+    pinned_status = tk.BooleanVar()
+    pinned_status.set(False)
+    pinnedButton = tk.Checkbutton(addCredentialScreen, text = "Pin Set on Creation?",
+        variable = pinned_status, onvalue = True, offvalue = False, 
+        command = lambda:pinnedStatusToggle(pinned_status))
     pinnedButton.pack()
     # add credential button (finalize)
     finalizeButton = tk.Button(addCredentialScreen, text = "Submit", 
         command = lambda:enforceConstraints(user_hash, 
         nameEntry.get(), usernameEntry.get(), passwordEntry.get(),
-        security1question.get(), security1answer.get(), security2question.get(), security2answer.get(), 
-        security3question.get(), security3answer.get(), addInfoEntry.get(), pinned))
+        security1questionEntry.get(), security1answerEntry.get(), security2questionEntry.get(), 
+        security2answerEntry.get(), security3questionEntry.get(), security3answerEntry.get(), 
+        addInfoEntry.get(), pinned_status.get()))
     finalizeButton.pack()
     # add clear button
     clearButton = tk.Button(addCredentialScreen, text = "Clear",
