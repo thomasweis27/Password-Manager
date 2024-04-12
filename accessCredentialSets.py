@@ -25,11 +25,15 @@
         # allows user to select a site, open the info, and edit or delete
         # Component is complete at this point.
         # FINAL: go to view screen in the selectCredential helper function
+# 04/12 - Interface with viewCredentialScreen implemented
+        # small documentation and program layout tweaks.
+        # NO TO DO
 
 #_____________________________________________________________________________________________________
 
 import tkinter as tk
 import Decrypt as dec
+from viewCredentialSet import viewCredentialSet
 
 ## helper functions of this component
 
@@ -54,26 +58,30 @@ def clearSearch(user_hash, previousWindow, accessCredentialScreen):
     accessCredentialSets(user_hash, previousWindow)
 
 
-# selectCredentialSet function
-    # validates that there is a site selected 
-    # before moving to viewCredentialSet module
-def selectCredentialSet(credential_set):
-    print(credential_set)
-    # TO DO: go to viewCredentialSet
-
-
 #_____________________________________________________________________________________________________
 
 ## Main Component Functions
 ## flow of program: accessCredentialSets() -> searchCredentials() -> 
-##      enforceConstraints() -> termedSearch() <-> enforceCredentials()
+##      enforceConstraints() -> termedSearch() <-> searchCredentials() -> selectCredentialSet()
 ## accessCredentialSets() will interface with the main system driver
 ## searchCredentials() will get a search term from the user and separate searching from initializing
 ## enforceConstraints() will make sure the search term is within the constraints of the data type
 ## termedSearch() will take the given search term and find any matches in the database file
+## selectCredentialSet() is the final step in the component; gets the selected set and passes it on
 ## segments are declared and defined in reverse order
 
 #_____________________________________________________________________________________________________
+
+
+# selectCredentialSet function
+    # validates that there is a site selected before moving to viewCredentialSet module
+def selectCredentialSet(user_hash, accessCredentialScreen, credential_set_name, user_sites):
+    # get the entire credential from the list of user's sites
+    for site in user_sites:
+        if site[1] == credential_set_name:
+            full_credential_set = site
+    # move to the next component
+    viewCredentialSet(user_hash, accessCredentialScreen, full_credential_set)
 
 
 # termedSearch function
@@ -173,7 +181,8 @@ def searchCredentials(user_hash, previousWindow, accessCredentialScreen):
     siteList.pack()
     # select site button
     selectButton = tk.Button(accessCredentialScreen, text = "Select", 
-        command = lambda:selectCredentialSet(siteList.get(tk.ACTIVE)))
+        command = lambda:selectCredentialSet(user_hash, accessCredentialScreen,
+            siteList.get(tk.ACTIVE), user_sites))
     selectButton.pack()
 
 
