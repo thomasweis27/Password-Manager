@@ -75,13 +75,13 @@ def clearSearch(user_hash, previousWindow, accessCredentialScreen):
 
 # selectCredentialSet function
     # validates that there is a site selected before moving to viewCredentialSet module
-def selectCredentialSet(user_hash, accessCredentialScreen, credential_set_name, user_sites):
+def selectCredentialSet(user_hash, previousWindow, accessCredentialScreen, credential_set_name, user_sites):
     # get the entire credential from the list of user's sites
     for site in user_sites:
         if site[1] == credential_set_name:
             full_credential_set = site
     # move to the next component
-    viewCredentialSet(user_hash, accessCredentialScreen, full_credential_set)
+    viewCredentialSet(user_hash, previousWindow, accessCredentialScreen, full_credential_set)
 
 
 # termedSearch function
@@ -139,7 +139,7 @@ def enforceConstraints(user_hash, previousWindow, accessCredentialScreen, siteLi
     # establishes the ability to search with the button;
     # separates the initialization of the window from the
     # repeatable search function.
-def searchCredentials(user_hash, previousWindow, accessCredentialScreen):
+def searchCredentials(user_hash, previousWindow, accessCredentialScreen, siteList, user_sites):
     # get the search term from the user
     searchbarLabel = tk.Label(accessCredentialScreen, text = "Enter a term: ")
     searchbarLabel.pack()
@@ -155,34 +155,10 @@ def searchCredentials(user_hash, previousWindow, accessCredentialScreen):
     clearButton = tk.Button(accessCredentialScreen, text = "Clear", 
         command = lambda:clearSearch(user_hash, previousWindow, accessCredentialScreen))
     clearButton.pack()
-    # create the site list element
-    siteList = tk.Listbox(accessCredentialScreen)
-    # add every one of the user's sites to the sitelist element
-    user_sites = []
-    # open the credentials file
-    with open("credentials.txt") as file:
-        for line in file:
-            # decrypt the line
-            #
-            # remove any commented lines
-            if not(line.startswith("$")):
-                # check the hash
-                split_line = line.split(",")
-                if split_line[0] == user_hash:
-                    # the hash matches, add to the list of user sites
-                    user_sites.append(split_line)
-                # otherwise the hashes don't match; continue to next site
-                continue
-    # close the file
-    file.close()
-    # add each site name to the list on screen
-    for site in user_sites:        
-        siteList.insert(tk.END, site[1])
-    siteList.pack()
     # select site button
     selectButton = tk.Button(accessCredentialScreen, text = "Select", 
-        command = lambda:selectCredentialSet(user_hash, accessCredentialScreen,
-            siteList.get(tk.ACTIVE), user_sites))
+        command = lambda:selectCredentialSet(user_hash, previousWindow, 
+            accessCredentialScreen, siteList.get(tk.ACTIVE), user_sites))
     selectButton.pack()
 
 
@@ -205,8 +181,33 @@ def accessCredentialSets(user_hash, previousWindow):
         + "To search for a specific site, enter a search term and click 'Search'.\n"
         + "Any service that includes that term will show.")
     infoLabel.pack()
+    # create the site list element
+    siteList = tk.Listbox(accessCredentialScreen)
+    siteList.delete(0, siteList.size())
+    # add every one of the user's sites to the sitelist element
+    user_sites = []
+    # open the credentials file
+    with open("credentials.txt") as file:
+        for line in file:
+            # decrypt the line
+            #
+            # remove any commented lines
+            if not(line.startswith("$")):
+                # check the hash
+                split_line = line.split(",")
+                if split_line[0] == user_hash:
+                    # the hash matches, add to the list of user sites
+                    user_sites.append(split_line)
+                # otherwise the hashes don't match; continue to next site
+                continue
+    # close the file
+    file.close()
+    # add each site name to the list on screen
+    for site in user_sites:        
+        siteList.insert(tk.END, site[1])
+    siteList.pack()
     # move to next segment, searchCredentials
-    searchCredentials(user_hash, previousWindow, accessCredentialScreen)
+    searchCredentials(user_hash, previousWindow, accessCredentialScreen, siteList, user_sites)
     # return to previous screen
     returnButton = tk.Button(accessCredentialScreen, text = "<- Back", 
         command = lambda:returnToPrevious(accessCredentialScreen, previousWindow))

@@ -12,6 +12,8 @@
         # TO DO: Implement all of editCredentialSet() function;
         # complete implementation of deleteCredentialSet() function
             # all that is needed is the actual deletion after confirmation
+# 04/12-2 - Delete functionality completed
+        # TO DO: Implement all of editCredentialSet() function
 
 #_____________________________________________________________________________________________________
 
@@ -49,10 +51,65 @@ def editCredentialSet():
     print("editCredentialSet(): WIP function")
 
 
+# removeFromDatabase function
+    # takes the passed (selected) credential set
+    # finds and removes the set from the data file
+def removeFromDatabase(user_hash, credentialsMainScreen, viewCredentialScreen, confirmPopup, selected_set):
+    # line index memory variable
+    target_index = 1
+    # text lines memory for later use
+    text_lines = []
+    # open the credentials file
+    with open("credentials.txt", "r") as readfile:
+        # read all the lines of the file into memory
+        text_lines = readfile.readlines()
+        # read every line of the file
+        for line in text_lines:
+            # decrypt the line
+            #
+            # ignore any commented lines
+            if not(line.startswith("$")):
+                # get the line's hash
+                split_line = line.split(",")
+                # ignore lines that don't match hashes
+                if split_line[0] == user_hash:
+                    # ignore lines that don't match names
+                    if split_line[1] == selected_set[1]:
+                        # this is the line that needs to be removed
+                        break
+            # one of the three checks failed; increment line index & continue
+            target_index += 1
+            continue
+        # close the read file
+        readfile.close()
+    # target line is known; re-open the file in writing mode
+    with open("credentials.txt", "w") as writefile:
+        # writefile index memory variable
+        current_index = 1
+        # go through each line and find the matching line index
+        for line in text_lines:
+            # re-write every line UNLESS the indexes match
+            if not(current_index == target_index):
+                # rewrite the line
+                writefile.write(line)
+            # increment line index
+            current_index += 1
+    # close the file
+    writefile.close()
+    # minimize the confirm popup
+    confirmPopup.withdraw()
+    # notify that the set has been deleted
+    tk.messagebox.showinfo("Error", "Your set '" + selected_set[1] + "' has been deleted.")
+    # maximize the credentialsMainScreen
+    credentialsMainScreen.deiconify()
+    # minimize the view window
+    viewCredentialScreen.withdraw()
+
+
 # deleteCredentialSet function
     # confirms the deletion with the user;
     # searches the file for the selected set and removes it
-def deleteCredentialSet(user_hash, viewCredentialScreen, selected_set):
+def deleteCredentialSet(user_hash, credentialsMainScreen, viewCredentialScreen, selected_set):
     # create new popup for user to confirm or deny deletion
     confirmPopup = tk.Tk()
     confirmPopup.title("Password Manager")
@@ -64,7 +121,7 @@ def deleteCredentialSet(user_hash, viewCredentialScreen, selected_set):
     # confirm/cancel buttons
     confirmButton = tk.Button(confirmPopup, text = "Confirm Deletion",
         # TO DO: finalize deletion
-        command = lambda:tk.messagebox.showinfo("Error", "This button is WIP"))
+        command = lambda:removeFromDatabase(user_hash, credentialsMainScreen, viewCredentialScreen, confirmPopup, selected_set))
     confirmButton.pack()
     cancelButton = tk.Button(confirmPopup, text = "Cancel Deletion", 
         # minimizes the popup
@@ -74,7 +131,7 @@ def deleteCredentialSet(user_hash, viewCredentialScreen, selected_set):
 
 # viewCredentialSet function
     # opens a window showing the user all of the information on this specific set
-def viewCredentialSet(user_hash, previousWindow, selected_set):
+def viewCredentialSet(user_hash, credentialsMainScreen, previousWindow, selected_set):
     # close previous window
     previousWindow.withdraw()
     # create new window through tk; assign attributes
@@ -131,6 +188,6 @@ def viewCredentialSet(user_hash, previousWindow, selected_set):
     editSetButton.pack()
     # delete button
     deleteSetButton = tk.Button(viewCredentialScreen, text = "Delete Set",
-        command = lambda:deleteCredentialSet(user_hash, viewCredentialScreen, selected_set))
+        command = lambda:deleteCredentialSet(user_hash, credentialsMainScreen, viewCredentialScreen, selected_set))
     deleteSetButton.pack()
     # move to next segment
