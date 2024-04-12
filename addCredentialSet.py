@@ -23,11 +23,13 @@
         # TO DO: fix issues with security questions clearing even with values
             # fix functionality of pinned radial button
 # 04/09-2 - Fixes for security question issues
-        #
+        # Security questions hold their appropriate values
+        # Pinned status properly toggles
 
 #_____________________________________________________________________________________________________
 
 import tkinter as tk
+import Encrypt as enc
 
 ## helper functions of this component
 
@@ -103,12 +105,13 @@ def validateInput(value, max_length, format_mode, forced_entry):
     return True
 
 
+# pinnedStatusToggle function
+    # toggles the setting of the pinned status on checkbox interaction
 def pinnedStatusToggle(pinned_status):
     if pinned_status.get() == False:
         pinned_status.set(True)
     else:
         pinned_status.set(False)
-    print(pinned_status.get())
 
 
 #_____________________________________________________________________________________________________
@@ -153,12 +156,12 @@ def writeToData(user_hash, name, username, password, security1_active, security1
     data_line_output += str(security3_active) + "," + security3 + ","
     # additional info, pinned status
     data_line_output += add_info + "," + str(pinned_status) + "$"
-    # encrypt the line
-    #
     # open the credentials data file
     credentials = open("credentials.txt", "a")
+    # encrypt the line
+    # data_line_output = enc.encrypt(data_line_output, "placeholder")
     # append the data to the file
-    credentials.write(data_line_output)
+    credentials.write(str(data_line_output))
     # close the credentials data file
     credentials.close()
 
@@ -239,12 +242,11 @@ def enforceConstraints(user_hash, name, username, password,
     else:
         security3 = ""
         security3_active = False
-    # process pinned_status flag
-    print("At Input Processing: pinned_status = " + str(pinned_status))
     # show the user their new credential set
-    tk.messagebox.showinfo("Error", "Success\nAdding " + name + " with " + username + " and " 
-        + password + "\n" + " security questions " + security1 + ", " + security2 + ", " 
-        + security3 + "\nAdditional info: " + add_info + "\nPinned: " + str(pinned_status))
+    tk.messagebox.showinfo("Error", "Success!\nAdding a new set:\n" 
+        + name + "\nUsername: " + username + "\nPassword: " + password 
+        + "\nSecurity questions:\n" + security1 + "\n" + security2 + "\n" + security3 
+        + "\nAdditional info: " + add_info + "\nPinned: " + str(pinned_status))
     # last step - format line and write to data
     writeToData(user_hash, name, username, password, security1_active, security1, 
         security2_active, security2, security3_active, security3, add_info, pinned_status)
@@ -328,7 +330,6 @@ def gatherInformation(user_hash, previousWindow, addCredentialScreen):
     clearButton = tk.Button(addCredentialScreen, text = "Clear",
         command = lambda:clearInformation(user_hash, previousWindow, addCredentialScreen))
     clearButton.pack()
-
 
 
 # primary function (component driver, called from system driver)

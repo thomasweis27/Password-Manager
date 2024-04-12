@@ -20,11 +20,16 @@
         # Broke down the screens to allow for better & faster UI
         # Fixes for case sensitivity and consecutivity on searches
         # TO DO: Still need to set up selection and set information screen
+# 04/10-11 - Final steps on access. 
+        # Added "Select" button that interfaces with the view screen
+        # allows user to select a site, open the info, and edit or delete
+        # Component is complete at this point.
+        # FINAL: go to view screen in the selectCredential helper function
 
 #_____________________________________________________________________________________________________
 
-
 import tkinter as tk
+import Decrypt as dec
 
 ## helper functions of this component
 
@@ -47,6 +52,14 @@ def clearSearch(user_hash, previousWindow, accessCredentialScreen):
     accessCredentialScreen.withdraw()
     # call back to the beginning of the accessCredential component
     accessCredentialSets(user_hash, previousWindow)
+
+
+# selectCredentialSet function
+    # validates that there is a site selected 
+    # before moving to viewCredentialSet module
+def selectCredentialSet(credential_set):
+    print(credential_set)
+    # TO DO: go to viewCredentialSet
 
 
 #_____________________________________________________________________________________________________
@@ -90,7 +103,7 @@ def termedSearch(user_hash, previousWindow, accessCredentialScreen, siteList, se
     # allow for change of the search term (searchCredentials <-> termedSearch segment)
     searchButton.command = lambda:enforceConstraints(user_hash, previousWindow, 
         accessCredentialScreen, siteList, searchButton, term, user_sites)
-    searchButton.pack()
+    searchButton.pack()    
 
 
 # enforceConstraints function
@@ -141,13 +154,14 @@ def searchCredentials(user_hash, previousWindow, accessCredentialScreen):
     # open the credentials file
     with open("credentials.txt") as file:
         for line in file:
+            # decrypt the line
+            #
             # remove any commented lines
             if not(line.startswith("$")):
                 # check the hash
                 split_line = line.split(",")
                 if split_line[0] == user_hash:
                     # the hash matches, add to the list of user sites
-                    print(line.rstrip())
                     user_sites.append(split_line)
                 # otherwise the hashes don't match; continue to next site
                 continue
@@ -157,6 +171,10 @@ def searchCredentials(user_hash, previousWindow, accessCredentialScreen):
     for site in user_sites:        
         siteList.insert(tk.END, site[1])
     siteList.pack()
+    # select site button
+    selectButton = tk.Button(accessCredentialScreen, text = "Select", 
+        command = lambda:selectCredentialSet(siteList.get(tk.ACTIVE)))
+    selectButton.pack()
 
 
 # accessCredentialSets function
@@ -168,7 +186,7 @@ def accessCredentialSets(user_hash, previousWindow):
     # create new window through tk; assign attributes
     accessCredentialScreen = tk.Tk()
     accessCredentialScreen.title("Password Manager")
-    accessCredentialScreen.geometry("800x450")
+    accessCredentialScreen.geometry("800x675")
     # create label for the UI
     accessCredLabel = tk.Label(accessCredentialScreen, text = "Access Your Credentials")
     # package this into the UI
