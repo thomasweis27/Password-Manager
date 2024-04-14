@@ -14,6 +14,12 @@
             # all that is needed is the actual deletion after confirmation
 # 04/12-2 - Delete functionality completed
         # TO DO: Implement all of editCredentialSet() function
+# 04/13 - Edit Functionality partially implemented
+        # UI is fully implemented; backend needs work.
+        # TO DO: Implement retrieval of new info
+        # check for blank entries and don't overwrite them.
+        # write new credential set information line to the set's position in file
+        # fix pinned status function on UI (checkbutton)
 
 #_____________________________________________________________________________________________________
 
@@ -33,11 +39,21 @@ def returnToPrevious(currentWindow, previousWindow):
     previousWindow.deiconify()
 
 
+# pinnedStatusToggle function
+    # toggles the setting of the pinned status on checkbox interaction
+def pinnedStatusToggle(pinned_status):
+    if pinned_status.get() == False:
+        pinned_status.set(True)
+    else:
+        pinned_status.set(False)
+
+
 #_____________________________________________________________________________________________________
 
 ## Main Component Functions
 ## flow of program: viewCredentialSet() <-> editCredentialSet() <-> deleteCredentialSet()
 ## viewCredentialSet() will interface with accessCredentialSets()
+## editCredentialSet() allows the user to edit any field on the set and save the changes
 ## deleteCredentialSet() allows user to delete sets from their list; forces confirmation
 ## segments are declared and defined in reverse order
 
@@ -47,8 +63,83 @@ def returnToPrevious(currentWindow, previousWindow):
 # editCredentialSet function
     # allows user to update or remove any information fields of the set
     # user can move directly from edit to delete
-def editCredentialSet():
+def editCredentialSet(user_hash, viewCredentialScreen, selected_set):
     print("editCredentialSet(): WIP function")
+    # close previous window
+    viewCredentialScreen.withdraw()
+    # create new window through tk; assign attributes
+    editCredentialScreen = tk.Tk()
+    editCredentialScreen.title("Password Manager")
+    editCredentialScreen.geometry("800x675")
+    # create label for the UI
+    editCredLabel = tk.Label(editCredentialScreen, text = selected_set[1])
+    # package this into the UI
+    editCredLabel.pack()
+    # tell the user what they are seeing
+    infoLabel = tk.Label(editCredentialScreen, text = "Enter text in any of the boxes"
+        + " to change that piece of information.\nClick 'Save' when you have finished your edits.")
+    infoLabel.pack()
+    # entry fields for each info field
+    # username
+    usernameLabel = tk.Label(editCredentialScreen, text = "Current Username: " + selected_set[2])
+    usernameLabel.pack()
+    usernameField = tk.Entry(editCredentialScreen)
+    usernameField.pack()
+    usernameFieldEntry = tk.StringVar()
+    # password
+    passwordLabel = tk.Label(editCredentialScreen, text = "Current Password: " + selected_set[3])
+    passwordLabel.pack()
+    passwordField = tk.Entry(editCredentialScreen)
+    passwordField.pack()
+    passwordFieldEntry = tk.StringVar()
+    # security 1
+    security1Label = tk.Label(editCredentialScreen, text = "Current Security Question 1:\n" 
+        + selected_set[5])
+    security1Label.pack()
+    security1Field = tk.Entry(editCredentialScreen)
+    security1Field.pack()
+    security1FieldEntry = tk.StringVar()
+    # security 2
+    security2Label = tk.Label(editCredentialScreen, text = "Current Security Question 2:\n" 
+        + selected_set[7])
+    security2Label.pack()
+    security2Field = tk.Entry(editCredentialScreen)
+    security2Field.pack()
+    security2FieldEntry = tk.StringVar()
+    # security 3
+    security3Label = tk.Label(editCredentialScreen, text = "Current Security Question 3:\n" 
+        + selected_set[9])
+    security3Label.pack()
+    security3Field = tk.Entry(editCredentialScreen)
+    security3Field.pack()
+    security3FieldEntry = tk.StringVar()
+    # additional information
+    addInfoLabel = tk.Label(editCredentialScreen, text = "Current Additional Info:\n"
+        + selected_set[10])
+    addInfoLabel.pack()
+    addInfoField = tk.Entry(editCredentialScreen)
+    addInfoField.pack()
+    addInfoFieldEntry = tk.StringVar()
+    # pinned status
+    pinnedStatusField = tk.Label(editCredentialScreen, text = "Currently Pinned?: " 
+        # removes the $ end of string symbol
+        + (selected_set[11]).replace("$", ""))
+    pinnedStatusField.pack()
+    pinned_status = selected_set[11].replace("$", "")
+    if pinned_status == "True":
+        pinned_status = tk.BooleanVar()
+        pinned_status.set(True)
+    else:
+        pinned_status = tk.BooleanVar()
+        pinned_status.set(False)
+    pinnedButton = tk.Checkbutton(editCredentialScreen,
+        variable = pinned_status, onvalue = True, offvalue = False, 
+        command = lambda:pinnedStatusToggle(pinned_status))
+    pinnedButton.pack()
+    # return to previous screen
+    returnButton = tk.Button(viewCredentialScreen, text = "<- Back", 
+        command = lambda:returnToPrevious(editCredentialScreen, viewCredentialScreen))
+    returnButton.pack(side = tk.BOTTOM)
 
 
 # removeFromDatabase function
@@ -184,7 +275,7 @@ def viewCredentialSet(user_hash, credentialsMainScreen, previousWindow, selected
     # edit button
     editSetButton = tk.Button(viewCredentialScreen, text = "Edit Set",
         # TO DO: implement edit functionality
-        command = lambda:tk.messagebox.showinfo("Error", "This button is WIP"))
+        command = lambda:editCredentialSet(user_hash, viewCredentialScreen, selected_set))
     editSetButton.pack()
     # delete button
     deleteSetButton = tk.Button(viewCredentialScreen, text = "Delete Set",
