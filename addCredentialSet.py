@@ -243,7 +243,7 @@ def enforceConstraints(user_hash, name, username, password,
         security3 = ""
         security3_active = False
     # show the user their new credential set
-    tk.messagebox.showinfo("Error", "Success!\nAdding a new set:\n" 
+    tk.messagebox.showinfo("Add Set", "Success!\nAdding a new set:\n" 
         + name + "\nUsername: " + username + "\nPassword: " + password 
         + "\nSecurity questions:\n" + security1 + "\n" + security2 + "\n" + security3 
         + "\nAdditional info: " + add_info + "\nPinned: " + str(pinned_status))

@@ -89,7 +89,7 @@ def selectCredentialSet(user_hash, previousWindow, accessCredentialScreen, crede
     # queries the data file for an entry with that term in any of its fields
 def termedSearch(user_hash, previousWindow, accessCredentialScreen, siteList, searchButton, term, user_sites):
     # verify the search term to the user
-    tk.messagebox.showinfo("Error", "Searching for sites with " + term)
+    tk.messagebox.showinfo("Search Sets", "Searching for sites with " + term)
     # clear the site list box
     siteList.delete(0, siteList.size())
     # lowercase the term
@@ -122,13 +122,13 @@ def enforceConstraints(user_hash, previousWindow, accessCredentialScreen, siteLi
         # term is invalid, alert user
         tk.messagebox.showinfo("Error", "Please enter a search term that is 1-32 characters in length.")
         # call back to the searchCredentials segment
-        accessCredentialSets(user_hash, previousWindow, accessCredentialScreen)
+        accessCredentialSets(user_hash, previousWindow)
     # otherwise length is fine; check format
     elif not(all((char.isalnum()) or (char.isspace()) for char in term)):
         # the term is not alphanumeric
         tk.messagebox.showinfo("Error", "Please enter a search term that is alphanumeric (no special characters).")
         # call back to the searchCredentials segment
-        accessCredentialSets(user_hash, previousWindow, accessCredentialScreen)
+        accessCredentialSets(user_hash, previousWindow)
     # term is valid length and format, continue to search
     else:
         # otherwise the term is valid
