@@ -11,5 +11,6 @@
 * decrypt.py                A program for decrypting data
 * accessCredentialSets.py   Access credentials from the txt file
 * addCredentialSet.py       Add credentials to the txt file
+* viewCredentialSet.py      View and edit a set's fields; delete sets
 * credentialsMainScreen.py  Main program after authenticating
 * credentials.txt           Stores all credentials for users.
