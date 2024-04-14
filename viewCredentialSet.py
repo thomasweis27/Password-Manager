@@ -20,6 +20,11 @@
         # check for blank entries and don't overwrite them.
         # write new credential set information line to the set's position in file
         # fix pinned status function on UI (checkbutton)
+# 04/14 - More edit functionality
+        # fix for pinned status on UI checkbutton
+        # introduced new segment updateCredentialSet that will format new line;
+        # and overwrite the previous credential set line in data
+        # TO DO: write updateCredentialSet() function
 
 #_____________________________________________________________________________________________________
 
@@ -51,13 +56,23 @@ def pinnedStatusToggle(pinned_status):
 #_____________________________________________________________________________________________________
 
 ## Main Component Functions
-## flow of program: viewCredentialSet() <-> editCredentialSet() <-> deleteCredentialSet()
+## flow of program: viewCredentialSet() <-> editCredentialSet() -> 
+##                  updateCredentialSet() || viewCredentialSet() <-> deleteCredentialSet()
 ## viewCredentialSet() will interface with accessCredentialSets()
 ## editCredentialSet() allows the user to edit any field on the set and save the changes
 ## deleteCredentialSet() allows user to delete sets from their list; forces confirmation
+## updateCredentialSet() takes values input by the user in editCredentialSet() and writes it to data
 ## segments are declared and defined in reverse order
 
 #_____________________________________________________________________________________________________
+
+
+# updateCredentialSet function
+    # takes gathered information from the edit screen;
+    # checks for any edited values and updates the set in data
+def updateCredentialSet(user_hash, selected_set, new_username, new_password, 
+        new_security1, new_security2, new_security3, new_add_info, new_pinned_status):
+    print("updating credential set")
 
 
 # editCredentialSet function
@@ -121,21 +136,32 @@ def editCredentialSet(user_hash, viewCredentialScreen, selected_set):
     addInfoField.pack()
     addInfoFieldEntry = tk.StringVar()
     # pinned status
-    pinnedStatusField = tk.Label(editCredentialScreen, text = "Currently Pinned?: " 
-        # removes the $ end of string symbol
-        + (selected_set[11]).replace("$", ""))
-    pinnedStatusField.pack()
-    pinned_status = selected_set[11].replace("$", "")
-    if pinned_status == "True":
-        pinned_status = tk.BooleanVar()
-        pinned_status.set(True)
-    else:
-        pinned_status = tk.BooleanVar()
-        pinned_status.set(False)
+    pinnedStatusLabel = tk.Label(editCredentialScreen, text = "Currently Pinned?: ")
+    pinnedStatusLabel.pack()
+    # remove the $ end of string symbol from pinned_status
+    # get a temporary value of pinned and create a status boolean variable
+    temp_pinned = selected_set[11].replace("$", "")
+    pinned_status = tk.BooleanVar()
+    # add the checkbox to the UI, toggled on if set is already pinned
     pinnedButton = tk.Checkbutton(editCredentialScreen,
         variable = pinned_status, onvalue = True, offvalue = False, 
         command = lambda:pinnedStatusToggle(pinned_status))
+    # if currently pinned
+    if temp_pinned == "True":
+        # set pinned_status button var to true; select box
+        pinned_status.set(True)
+        pinnedButton.select()
+    else:
+        # set pinned_status button var to false; deselect box
+        pinned_status.set(False)
+        pinnedButton.deselect()
     pinnedButton.pack()
+    # save button (collect info)
+    saveButton = tk.Button(editCredentialScreen, text = "Save",
+        command = lambda:updateCredentialSet(user_hash, selected_set, usernameFieldEntry.get(), 
+        passwordFieldEntry.get(), security1FieldEntry.get(), security2FieldEntry.get(), 
+        security3FieldEntry.get(), addInfoFieldEntry.get(), pinned_status))
+    saveButton.pack()
     # return to previous screen
     returnButton = tk.Button(viewCredentialScreen, text = "<- Back", 
         command = lambda:returnToPrevious(editCredentialScreen, viewCredentialScreen))
