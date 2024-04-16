@@ -1,8 +1,10 @@
 import tkinter as tk
 from tkinter import messagebox
 import hashlib
+from Decrypt import decrypt as dec
+from Encrypt import encrypt as enc
 
-def checkPasswordRequirements(usernameEntry, passwordEntry, login, createAccount):
+def checkPasswordRequirements(usernameEntry, passwordEntry, usernameOld, passwordOld, login, createAccount):
     print("Checking requirements...")
     specalCharacters = "[!@#$%^&*()+_-=}{[]:\|,./<>?;'<>?"
     password = passwordEntry.get()
@@ -19,7 +21,7 @@ def checkPasswordRequirements(usernameEntry, passwordEntry, login, createAccount
     elif any(char in specalCharacters for char in password) == False:
         messagebox.showinfo("Error", "Please make sure that the password contains a special character.")
     else:
-        getNewUser(usernameEntry, passwordEntry, login)
+        getNewUser(usernameEntry, passwordEntry, usernameOld, passwordOld, login)
         createAccount.destroy()
 
 
@@ -45,20 +47,56 @@ def checkNewAndOldUserAndPAss(usernameEntry, passwordEntry, usernameEntrynew, pa
     print(usernameEntry.get(), passwordEntry.get(), usernameEntrynew.get(), passwordEntrynew.get(), login, createAccount)
     if checkExistingUser(usernameEntry, passwordEntry) == True:
         print("That passed")
-        checkPasswordRequirements(usernameEntrynew, passwordEntrynew, login, createAccount)
+        checkPasswordRequirements(usernameEntrynew, passwordEntrynew, usernameEntry, passwordEntry, login, createAccount)
 
 
-def getNewUser(usernameEntry, passwordEntry, login):
+def getNewUser(usernameEntry, passwordEntry, usernameOld, passwordOld, login):
     enteredUsername = usernameEntry.get()
     enteredPassword = passwordEntry.get()
+    usernameOld = usernameOld.get()
+    passwordOld = passwordOld.get()
 
-    print(enteredUsername, enteredPassword)
+    print("Old user and pass:", usernameOld, passwordOld)
+    print("New user and pass:", enteredUsername, enteredPassword)
     data = enteredUsername + enteredPassword
+    dataOld = usernameOld + passwordOld
     hashed_data = hashlib.sha256(data.encode())
-    print(hashed_data.hexdigest())
+    hashedOldData = hashlib.sha256(dataOld.encode())
+    print("The new hash", hashed_data.hexdigest())
+    print("The old hash", hashedOldData.hexdigest())
 
     with open("users.txt", "a") as file:
         file.write("\n" + hashed_data.hexdigest())
+    file.close()
+
+    credentials = []
+
+    #TODO change the values of the hashe in credemtials.txt
+    with open("credentials.txt", "r") as readfile:
+        for line in readfile:
+            try:
+                dictionary = eval(line)
+                line  = dec(dictionary, passwordOld)
+                line = "$"+str(line)
+                print("Edited line", line)
+                print("This is the hashed old data", str(hashedOldData.hexdigest())) 
+                if hashedOldData.hexdigest() in line:
+                    print("Old line", line)
+                    line = line.replace(hashedOldData.hexdigest(), hashed_data.hexdigest())
+                    print("New line:", line)
+                credentials.append(line)
+                    
+            except:
+                print("Something didn't work.")
+    readfile.close()
+
+    print(credentials)
+
+    with open("credentials.txt", "w") as writefile:
+        for item in credentials:
+            item  = enc(item, enteredPassword)
+            writefile.write(str(item)+"\n")
+    writefile.close()
 
     messagebox.showinfo("Success", "Account created successfully!")
     login.deiconify()
