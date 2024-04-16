@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import messagebox
 from addCredentialSet import addCredentialSet
 from accessCredentialSets import accessCredentialSets
+from Decrypt import decrypt
 
 
 def logout(login, window):
@@ -37,6 +38,32 @@ def credentialsMainScreen(enteredPassword, currentHash, oldHash, login):
     recentListbox = tk.Listbox(master=frmRecentPin, height=10, width=20)
     pinnedLabel = tk.Label(master=frmRecentPin, text="Pinned Credentials")
     pinnedListbox = tk.Listbox(master=frmRecentPin, height=10, width=20)
+
+    # Here is where recently searched/looked at credentials are added to the list box
+
+
+
+
+    # Here is where pinned credentials are added to the list box
+    userSites = []
+    with open("credentials.txt") as file:
+        for line in file:
+            print(line)
+            try:
+                dictionary = eval(line)
+                line  = decrypt(dictionary, enteredPassword)
+                line = "$"+str(line)
+                if currentHash in line:
+                    split_line = line.split(",")
+                    userSites.append(split_line)
+            except:
+                pass
+    # close the file
+    file.close()
+    # add each site name to the list on screen
+    for site in userSites:
+        pinnedListbox.insert(tk.END, site[1])
+
 
     recentLabel.grid(row=0, column=0)
     recentListbox.grid(row=1, column=0)
