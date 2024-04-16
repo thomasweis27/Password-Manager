@@ -31,8 +31,9 @@
 
 #_____________________________________________________________________________________________________
 
+import json
 import tkinter as tk
-import Decrypt as dec
+from Decrypt import decrypt as dec
 from viewCredentialSet import viewCredentialSet
 
 ## helper functions of this component
@@ -51,11 +52,11 @@ def returnToPrevious(currentWindow, previousWindow):
 
 # clearSearch function
     # fixes issue with duplication of accessCredential window upon clearing search
-def clearSearch(user_hash, previousWindow, accessCredentialScreen):
+def clearSearch(user_hash, inputtedPassword, previousWindow, accessCredentialScreen):
     # withdraw the existing accessCredential window
     accessCredentialScreen.withdraw()
     # call back to the beginning of the accessCredential component
-    accessCredentialSets(user_hash, previousWindow)
+    accessCredentialSets(user_hash, inputtedPassword, previousWindow)
 
 
 #_____________________________________________________________________________________________________
@@ -75,13 +76,13 @@ def clearSearch(user_hash, previousWindow, accessCredentialScreen):
 
 # selectCredentialSet function
     # validates that there is a site selected before moving to viewCredentialSet module
-def selectCredentialSet(user_hash, previousWindow, accessCredentialScreen, credential_set_name, user_sites):
+def selectCredentialSet(user_hash, inputtedPassword, previousWindow, accessCredentialScreen, credential_set_name, user_sites):
     # get the entire credential from the list of user's sites
     for site in user_sites:
         if site[1] == credential_set_name:
             full_credential_set = site
     # move to the next component
-    viewCredentialSet(user_hash, previousWindow, accessCredentialScreen, full_credential_set)
+    viewCredentialSet(user_hash, inputtedPassword, previousWindow, accessCredentialScreen, full_credential_set)
 
 
 # termedSearch function
@@ -89,7 +90,7 @@ def selectCredentialSet(user_hash, previousWindow, accessCredentialScreen, crede
     # queries the data file for an entry with that term in any of its fields
 def termedSearch(user_hash, previousWindow, accessCredentialScreen, siteList, searchButton, term, user_sites):
     # verify the search term to the user
-    tk.messagebox.showinfo("Search Sets", "Searching for sites with " + term)
+    tk.messagebox.showinfo("Error", "Searching for sites with " + term)
     # clear the site list box
     siteList.delete(0, siteList.size())
     # lowercase the term
@@ -122,13 +123,13 @@ def enforceConstraints(user_hash, previousWindow, accessCredentialScreen, siteLi
         # term is invalid, alert user
         tk.messagebox.showinfo("Error", "Please enter a search term that is 1-32 characters in length.")
         # call back to the searchCredentials segment
-        accessCredentialSets(user_hash, previousWindow)
+        accessCredentialSets(user_hash, previousWindow, accessCredentialScreen)
     # otherwise length is fine; check format
     elif not(all((char.isalnum()) or (char.isspace()) for char in term)):
         # the term is not alphanumeric
         tk.messagebox.showinfo("Error", "Please enter a search term that is alphanumeric (no special characters).")
         # call back to the searchCredentials segment
-        accessCredentialSets(user_hash, previousWindow)
+        accessCredentialSets(user_hash, previousWindow, accessCredentialScreen)
     # term is valid length and format, continue to search
     else:
         # otherwise the term is valid
@@ -139,7 +140,7 @@ def enforceConstraints(user_hash, previousWindow, accessCredentialScreen, siteLi
     # establishes the ability to search with the button;
     # separates the initialization of the window from the
     # repeatable search function.
-def searchCredentials(user_hash, previousWindow, accessCredentialScreen, siteList, user_sites):
+def searchCredentials(user_hash, inputtedPassword, previousWindow, accessCredentialScreen, siteList, user_sites):
     # get the search term from the user
     searchbarLabel = tk.Label(accessCredentialScreen, text = "Enter a term: ")
     searchbarLabel.pack()
@@ -153,11 +154,11 @@ def searchCredentials(user_hash, previousWindow, accessCredentialScreen, siteLis
     searchButton.pack()
     # clear search button
     clearButton = tk.Button(accessCredentialScreen, text = "Clear", 
-        command = lambda:clearSearch(user_hash, previousWindow, accessCredentialScreen))
+        command = lambda:clearSearch(user_hash, inputtedPassword, previousWindow, accessCredentialScreen))
     clearButton.pack()
     # select site button
     selectButton = tk.Button(accessCredentialScreen, text = "Select", 
-        command = lambda:selectCredentialSet(user_hash, previousWindow, 
+        command = lambda:selectCredentialSet(user_hash, inputtedPassword, previousWindow, 
             accessCredentialScreen, siteList.get(tk.ACTIVE), user_sites))
     selectButton.pack()
 
@@ -165,7 +166,7 @@ def searchCredentials(user_hash, previousWindow, accessCredentialScreen, siteLis
 # accessCredentialSets function
     # initial functionality of this component
     # establishes windows, base ui, etc.
-def accessCredentialSets(user_hash, previousWindow):
+def accessCredentialSets(user_hash, inputtedPassword, previousWindow):
     # close previous window
     previousWindow.withdraw()
     # create new window through tk; assign attributes
@@ -189,17 +190,33 @@ def accessCredentialSets(user_hash, previousWindow):
     # open the credentials file
     with open("credentials.txt") as file:
         for line in file:
-            # decrypt the line
-            #
-            # remove any commented lines
-            if not(line.startswith("$")):
-                # check the hash
-                split_line = line.split(",")
-                if split_line[0] == user_hash:
-                    # the hash matches, add to the list of user sites
+            print(line)
+            try:
+                print(line)
+                dictionary = eval(line)
+                #print(type(dictionary), "\n\n")
+                #print(dictionary['salt'], "\n\n", dictionary['cipher_text'], "\n\n" , dictionary['nonce'], "\n\n", dictionary['tag'], "\n\n\n\n\n\n\n\n")
+                line  = dec(dictionary, inputtedPassword)
+                line = "$"+str(line)
+                print(line)
+                if user_hash in line:
+                    split_line = line.split(",")
+                    print(split_line)
                     user_sites.append(split_line)
-                # otherwise the hashes don't match; continue to next site
-                continue
+                    
+            except:
+                pass
+            # decrypt the line 
+            
+#            # remove any commented lines
+#            if not(line.startswith("$")):
+#                # check the hash
+#                split_line = line.split(",")
+#                if split_line[0] == user_hash:
+#                    # the hash matches, add to the list of user sites
+#                    user_sites.append(split_line)
+#                # otherwise the hashes don't match; continue to next site
+#                continue
     # close the file
     file.close()
     # add each site name to the list on screen
@@ -207,7 +224,7 @@ def accessCredentialSets(user_hash, previousWindow):
         siteList.insert(tk.END, site[1])
     siteList.pack()
     # move to next segment, searchCredentials
-    searchCredentials(user_hash, previousWindow, accessCredentialScreen, siteList, user_sites)
+    searchCredentials(user_hash, inputtedPassword, previousWindow, accessCredentialScreen, siteList, user_sites)
     # return to previous screen
     returnButton = tk.Button(accessCredentialScreen, text = "<- Back", 
         command = lambda:returnToPrevious(accessCredentialScreen, previousWindow))

@@ -131,7 +131,7 @@ def pinnedStatusToggle(pinned_status):
     # takes the successful credential set;
     # formats it to the proper data format;
     # writes that line to the database file
-def writeToData(user_hash, name, username, password, security1_active, security1, 
+def writeToData(user_hash, enteredPassword, name, username, password, security1_active, security1, 
         security2_active, security2, security3_active, security3, add_info, pinned_status):
     # force the entire input into a lowercase form
     # the boolean value fields (security questions active & pinned status) can't be;
@@ -157,11 +157,15 @@ def writeToData(user_hash, name, username, password, security1_active, security1
     # additional info, pinned status
     data_line_output += add_info + "," + str(pinned_status) + "$"
     # open the credentials data file
+    
     credentials = open("credentials.txt", "a")
     # encrypt the line
-    # data_line_output = enc.encrypt(data_line_output, "placeholder")
+    print(data_line_output)
+    data_line_output = enc.encrypt(data_line_output, enteredPassword)
+    print(data_line_output)
+    print(data_line_output['cipher_text'])
     # append the data to the file
-    credentials.write(str(data_line_output))
+    credentials.write(str(data_line_output)+"\n")
     # close the credentials data file
     credentials.close()
 
@@ -169,7 +173,7 @@ def writeToData(user_hash, name, username, password, security1_active, security1
 # enforceConstraints function
     # single function call to enforce the constraints on
     # all fields of a credential set
-def enforceConstraints(user_hash, name, username, password, 
+def enforceConstraints(user_hash, enteredPassword, name, username, password, 
     security1question, security1answer, security2question, security2answer, 
     security3question, security3answer, add_info, pinned_status):
     # check the name
@@ -243,19 +247,19 @@ def enforceConstraints(user_hash, name, username, password,
         security3 = ""
         security3_active = False
     # show the user their new credential set
-    tk.messagebox.showinfo("Add Set", "Success!\nAdding a new set:\n" 
+    tk.messagebox.showinfo("Error", "Success!\nAdding a new set:\n" 
         + name + "\nUsername: " + username + "\nPassword: " + password 
         + "\nSecurity questions:\n" + security1 + "\n" + security2 + "\n" + security3 
         + "\nAdditional info: " + add_info + "\nPinned: " + str(pinned_status))
     # last step - format line and write to data
-    writeToData(user_hash, name, username, password, security1_active, security1, 
+    writeToData(user_hash, enteredPassword, name, username, password, security1_active, security1, 
         security2_active, security2, security3_active, security3, add_info, pinned_status)
 
 
 # gatherInformation function
     # separates the gathering of information from the initialization
     # prompts the user for information regarding their new set
-def gatherInformation(user_hash, previousWindow, addCredentialScreen):
+def gatherInformation(user_hash, enteredPassword, previousWindow, addCredentialScreen):
     # prompt for the service name
     # add service name input
     nameLabel = tk.Label(addCredentialScreen, text = "Site Name")
@@ -320,7 +324,7 @@ def gatherInformation(user_hash, previousWindow, addCredentialScreen):
     pinnedButton.pack()
     # add credential button (finalize)
     finalizeButton = tk.Button(addCredentialScreen, text = "Submit", 
-        command = lambda:enforceConstraints(user_hash, 
+        command = lambda:enforceConstraints(user_hash, enteredPassword,
         nameEntry.get(), usernameEntry.get(), passwordEntry.get(),
         security1questionEntry.get(), security1answerEntry.get(), security2questionEntry.get(), 
         security2answerEntry.get(), security3questionEntry.get(), security3answerEntry.get(), 
@@ -333,7 +337,7 @@ def gatherInformation(user_hash, previousWindow, addCredentialScreen):
 
 
 # primary function (component driver, called from system driver)
-def addCredentialSet(user_hash, previousWindow):    
+def addCredentialSet(user_hash, enteredPassword, previousWindow):    
     # minimize previous screen
     previousWindow.withdraw()
     # create new window through tk; assign attributes
@@ -349,4 +353,4 @@ def addCredentialSet(user_hash, previousWindow):
         command = lambda:returnToPrevious(addCredentialScreen, previousWindow))
     returnButton.pack(side = tk.BOTTOM)
     # move to next segment (gather info)
-    gatherInformation(user_hash, previousWindow, addCredentialScreen)
+    gatherInformation(user_hash, enteredPassword, previousWindow, addCredentialScreen)
