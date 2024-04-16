@@ -9,6 +9,8 @@ def logout(login, window):
     login.deiconify()
     window.withdraw()
 
+#TODO: create function that takes the old hash and replaces it with the new hash
+
 
 # enteredPassword, hashed_data.hexdigest() will be used to figure out if this is one of the current user's sites
 # oldhash will be used only if the user will be changing their login info.
@@ -25,8 +27,8 @@ def credentialsMainScreen(enteredPassword, currentHash, oldHash, login):
     frmSideBar.grid(row=0, column=0)
 
     mainBtn = tk.Button(master = frmSideBar, text = "Main", width=10, height=2)
-    searchBtn = tk.Button(master = frmSideBar, text = "Search", height=2, command=lambda: accessCredentialSets(currentHash, window))
-    addBtn = tk.Button(master = frmSideBar, text = "Add", height=2, command=lambda: addCredentialSet(currentHash, window))
+    searchBtn = tk.Button(master = frmSideBar, text = "Search", height=2, command=lambda: accessCredentialSets(currentHash, enteredPassword, window))#changed to add encryption!!!!!!
+    addBtn = tk.Button(master = frmSideBar, text = "Add", height=2, command=lambda: addCredentialSet(currentHash, enteredPassword, window))
     editBtn = tk.Button(master = frmSideBar, text = "Edit", height=2)
     accountBtn = tk.Button(master = frmSideBar, text = "Button", height=2)
     logoutBtn = tk.Button(master = frmSideBar, text = "Logout", height=2, command=lambda: logout(login, window))
