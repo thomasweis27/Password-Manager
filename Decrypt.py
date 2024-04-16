@@ -1,10 +1,9 @@
 #for more info, and seeing Encryption and decryption working together go to: https://replit.com/join/rhmcdwnovc-thomasweis1
 
-from base64 import b64encode, b64decode
+from base64 import b64decode
 import hashlib
-from Cryptodome.Cipher import AES
-import os
-from Cryptodome.Random import get_random_bytes
+from Crypto.Cipher import AES
+from Crypto.Random import get_random_bytes
 
 
 def decrypt(enc_dict, password):
@@ -27,4 +26,5 @@ def decrypt(enc_dict, password):
 
     # decrypt the cipher text
     decrypted = cipher.decrypt_and_verify(cipher_text, tag)
+    
     return decrypted
