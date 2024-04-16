@@ -2,11 +2,10 @@
 
 #pip install pycryptodomex
 
-from base64 import b64encode, b64decode
+from base64 import b64encode
 import hashlib
-from Cryptodome.Cipher import AES
-import os
-from Cryptodome.Random import get_random_bytes
+from Crypto.Cipher import AES
+from Crypto.Random import get_random_bytes
 
 
 def encrypt(plain_text, password):
