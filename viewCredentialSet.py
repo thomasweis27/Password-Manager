@@ -32,6 +32,14 @@
         # currently NO TO DO:
             # needs to be evaluated for efficiency;
             # lots of repeating code that may be tweaked if possible
+# 04/16 - restored code from merge request #2
+        # TO DO: review encryption on the following blocks:
+            # editCredentialSet()
+            # updateCredentialSet()
+            # Subsequently:
+                # wipeBlankLines()
+                # findLineInFile()
+                # overwriteLineInFile()
 
 #_____________________________________________________________________________________________________
 
@@ -373,7 +381,6 @@ def removeFromDatabase(inputtedPassword, credentialsMainScreen, viewCredentialSc
                 else: 
                     #wrong line, find the right one
                     target_index += 1
-                    
             except:
                 pass
     readfile.close()
