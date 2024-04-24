@@ -1,5 +1,5 @@
 # Password Manager: 
-This is the development of a password manager application, collaboratively built by Thomas Weis, Mason Ritchason, and W. Cale Morrison. Recognizing the growing need for secure login management, we designed this application to address the challenge of remembering and protecting numerous passwords. The application offers a user-friendly platform for storing and accessing login credentials, promoting improved updated hashing and AES-512 encryption.
+This is the development of a password manager application, collaboratively built by Thomas Weis, Mason Ritchason, and W. Cale Morrison. Recognizing the growing need for secure login management, we designed this application to address the challenge of remembering and protecting numerous passwords. The application offers a user-friendly platform for storing and accessing login credentials, promoting improved updated hashing and AES-256 encryption.
 
 Please run the main.py file for the best results.
 
