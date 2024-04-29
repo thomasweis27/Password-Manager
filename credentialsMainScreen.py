@@ -10,6 +10,31 @@ def logout(login, window):
     login.deiconify()
     window.withdraw()
 
+def addPinnedToList(enteredPassword, currentHash, pinnedListbox):
+    userSites = []
+    with open("credentials.txt") as file:
+        for line in file:
+            print(line)
+            try:
+                dictionary = eval(line)
+                line  = decrypt(dictionary, enteredPassword)
+                line = "$"+str(line)
+                if currentHash in line:
+                    split_line = line.split(",")
+                    # Search for pinned credential sets
+                    if split_line[-1] == "True$'":
+                        userSites.append(split_line)
+                    else:
+                        continue
+            except:
+                pass
+    # Close file
+    file.close()
+    # Add each site name to the listbox
+    for site in userSites:
+        pinnedListbox.insert(tk.END, site[1])
+    
+
 #TODO: create function that takes the old hash and replaces it with the new hash
 
 
@@ -40,30 +65,10 @@ def credentialsMainScreen(enteredPassword, currentHash, oldHash, login):
     pinnedListbox = tk.Listbox(master=frmRecentPin, height=10, width=20)
 
     # Here is where recently searched/looked at credentials are added to the list box
-
-
-
+    
 
     # Here is where pinned credentials are added to the list box
-    userSites = []
-    with open("credentials.txt") as file:
-        for line in file:
-            print(line)
-            try:
-                dictionary = eval(line)
-                line  = decrypt(dictionary, enteredPassword)
-                line = "$"+str(line)
-                if currentHash in line:
-                    split_line = line.split(",")
-                    userSites.append(split_line)
-            except:
-                pass
-    # close the file
-    file.close()
-    # add each site name to the list on screen
-    for site in userSites:
-        pinnedListbox.insert(tk.END, site[1])
-
+    addPinnedToList(enteredPassword, currentHash, pinnedListbox)
 
     recentLabel.grid(row=0, column=0)
     recentListbox.grid(row=1, column=0)
@@ -73,6 +78,4 @@ def credentialsMainScreen(enteredPassword, currentHash, oldHash, login):
     addBtn.grid(row=0, column=0, sticky="ew")
     searchBtn.grid(row=1, column=0, sticky="ew")
     logoutBtn.grid(row=2, column=0, sticky="ew")
-
-    window.mainloop()
 

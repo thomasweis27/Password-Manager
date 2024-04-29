@@ -493,3 +493,20 @@ def viewCredentialSet(user_hash, inputtedPassword, credentialsMainScreen, previo
     deleteSetButton = tk.Button(viewCredentialScreen, text = "Delete Set",
         command = lambda:deleteCredentialSet(inputtedPassword, credentialsMainScreen, viewCredentialScreen, selected_set))
     deleteSetButton.pack()
+
+
+def swapSet(enteredPassword, currentHash, userSites):
+    with open("credentials.txt") as file:
+        for line in file:
+            print(line)
+            try:
+                dictionary = eval(line)
+                line  = dec(dictionary, enteredPassword)
+                line = "$"+str(line)
+                if currentHash in line:
+                    split_line = line.split(",")
+                    userSites.append(split_line)
+            except:
+                pass
+    # Close file
+    file.close()
