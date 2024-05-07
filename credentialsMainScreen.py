@@ -14,7 +14,6 @@ def addPinnedToList(enteredPassword, currentHash, pinnedListbox):
     userSites = []
     with open("credentials.txt") as file:
         for line in file:
-            print(line)
             try:
                 dictionary = eval(line)
                 line  = decrypt(dictionary, enteredPassword)
@@ -33,6 +32,29 @@ def addPinnedToList(enteredPassword, currentHash, pinnedListbox):
     # Add each site name to the listbox
     for site in userSites:
         pinnedListbox.insert(tk.END, site[1])
+
+def addRecentToList(enteredPassword, currentHash, recentListbox):
+    userSites = []
+    with open("credentials.txt") as file:
+        for line in file:
+            try:
+                dictionary = eval(line)
+                line  = decrypt(dictionary, enteredPassword)
+                line = "$"+str(line)     
+                if currentHash in line:
+                    split_line = line.split(",")
+                    userSites.append(split_line)
+            except:
+                pass
+    # Close file
+    file.close()
+    # Add each site name to the listbox
+    if len(userSites) < 5:
+        for site in userSites:
+            recentListbox.insert(tk.END, site[1])
+    else:
+        for i in range(5):
+            recentListbox.insert(tk.END, userSites[i-5][1])
     
 
 #TODO: create function that takes the old hash and replaces it with the new hash
@@ -59,13 +81,13 @@ def credentialsMainScreen(enteredPassword, currentHash, oldHash, login):
     searchBtn = tk.Button(master = frmSideBar, text = "Search", height=2, command=lambda: accessCredentialSets(currentHash, enteredPassword, window))#changed to add encryption!!!!!!
     logoutBtn = tk.Button(master = frmSideBar, text = "Logout", height=2, command=lambda: logout(login, window))
 
-    recentLabel = tk.Label(master=frmRecentPin, text="Recently Searched Credentials")
+    recentLabel = tk.Label(master=frmRecentPin, text="Recently Added Credentials")
     recentListbox = tk.Listbox(master=frmRecentPin, height=10, width=20)
     pinnedLabel = tk.Label(master=frmRecentPin, text="Pinned Credentials")
     pinnedListbox = tk.Listbox(master=frmRecentPin, height=10, width=20)
 
     # Here is where recently searched/looked at credentials are added to the list box
-    
+    addRecentToList(enteredPassword, currentHash, recentListbox)
 
     # Here is where pinned credentials are added to the list box
     addPinnedToList(enteredPassword, currentHash, pinnedListbox)
