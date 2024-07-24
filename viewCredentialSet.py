@@ -32,6 +32,14 @@
         # currently NO TO DO:
             # needs to be evaluated for efficiency;
             # lots of repeating code that may be tweaked if possible
+# 04/16 - restored code from merge request #2
+        # TO DO: review encryption on the following blocks:
+            # editCredentialSet()
+            # updateCredentialSet()
+            # Subsequently:
+                # wipeBlankLines()
+                # findLineInFile()
+                # overwriteLineInFile()
 
 #_____________________________________________________________________________________________________
 
@@ -373,7 +381,6 @@ def removeFromDatabase(inputtedPassword, credentialsMainScreen, viewCredentialSc
                 else: 
                     #wrong line, find the right one
                     target_index += 1
-                    
             except:
                 pass
     readfile.close()
@@ -486,3 +493,20 @@ def viewCredentialSet(user_hash, inputtedPassword, credentialsMainScreen, previo
     deleteSetButton = tk.Button(viewCredentialScreen, text = "Delete Set",
         command = lambda:deleteCredentialSet(inputtedPassword, credentialsMainScreen, viewCredentialScreen, selected_set))
     deleteSetButton.pack()
+
+
+def swapSet(enteredPassword, currentHash, userSites):
+    with open("credentials.txt") as file:
+        for line in file:
+            print(line)
+            try:
+                dictionary = eval(line)
+                line  = dec(dictionary, enteredPassword)
+                line = "$"+str(line)
+                if currentHash in line:
+                    split_line = line.split(",")
+                    userSites.append(split_line)
+            except:
+                pass
+    # Close file
+    file.close()
